@@ -13,8 +13,7 @@ export function JobRow({ job }: { job: any }) {
           <div>
             <p className="font-semibold text-black">{job.description}</p>
             <p className="text-sm text-gray-700">
-              Customer:
-              {job.customer ? job.customer.name : " Deleted customer"} - Status:{" "}
+              Customer: {job.customer?.name || "Deleted customer"} - Status:{" "}
               {job.status}
             </p>
           </div>
@@ -54,8 +53,9 @@ export function JobRow({ job }: { job: any }) {
           <input
             name="description"
             defaultValue={job.description}
-            className="bg-white p-4 rounded-lg border placeholder-gray-600 text-gray-600 space-y-3 w-full"
+            className="bg-white p-4 rounded-lg border placeholder-gray-600 text-gray-600 w-full"
           />
+
           <select
             name="status"
             defaultValue={job.status}
@@ -73,7 +73,6 @@ export function JobRow({ job }: { job: any }) {
             >
               Save
             </button>
-
             <button
               type="button"
               onClick={() => setEditing(false)}

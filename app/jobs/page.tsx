@@ -1,9 +1,33 @@
 import { prisma } from "@/lib/prisma";
 import { createJob } from "./actions";
 import JobsTabs from "./JobsTabs";
+import JobsSearch from "./JobsSearch";
+import { JobRow } from "./JobRow";
 
-export default async function JobsPage() {
+export default async function JobsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ status?: string; q?: string }>;
+}) {
+  const params = await searchParams;
+
+  const status = params?.status || "ALL";
+  const q = params?.q || "";
+
   const jobs = await prisma.job.findMany({
+    where: {
+      AND: [
+        status !== "ALL" ? { status } : {},
+        q
+          ? {
+              OR: [
+                { description: { contains: q, mode: "insensitive" } },
+                { customer: { name: { contains: q, mode: "insensitive" } } },
+              ],
+            }
+          : {},
+      ],
+    },
     include: { customer: true },
     orderBy: { createdAt: "desc" },
   });
@@ -16,7 +40,9 @@ export default async function JobsPage() {
     <div className="max-w-3xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold text-black">Jobs</h1>
 
-      {/* Add Job Form */}
+      <JobsTabs currentStatus={status} />
+      <JobsSearch currentQuery={q} />
+
       <form
         action={createJob}
         className="bg-white p-4 rounded-lg border-gray-100 space-y-3"
@@ -25,7 +51,7 @@ export default async function JobsPage() {
           name="description"
           placeholder="Job Description"
           required
-          className="bg-white p-4 rounded-lg border placeholder-gray-600 text-gray-600 space-y-3 w-full"
+          className="bg-white p-4 rounded-lg border placeholder-gray-600 text-gray-600 w-full"
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -61,8 +87,11 @@ export default async function JobsPage() {
         </button>
       </form>
 
-      {/* Tabs Component */}
-      <JobsTabs jobs={jobs} />
+      <ul className="space-y-3">
+        {jobs.map((job) => (
+          <JobRow key={job.id} job={job} />
+        ))}
+      </ul>
     </div>
   );
 }

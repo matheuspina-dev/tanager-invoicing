@@ -1,9 +1,42 @@
 import { prisma } from "@/lib/prisma";
 import { createPayment } from "./actions";
 import { PaymentRow } from "./PaymentRow";
+import PaymentsTabs from "./PaymentsTabs";
+import PaymentsSearch from "./PaymentsSearch";
 
-export default async function PaymentsPage() {
+export default async function PaymentsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ status?: string; q?: string }>;
+}) {
+  const params = await searchParams;
+  const status = params?.status || "ALL";
+  const q = params?.q || "";
+
   const payments = await prisma.payment.findMany({
+    where: {
+      AND: [
+        status !== "ALL" ? { invoice: { status } } : {},
+        q
+          ? {
+              OR: [
+                {
+                  invoice: {
+                    job: { description: { contains: q, mode: "insensitive" } },
+                  },
+                },
+                {
+                  invoice: {
+                    job: {
+                      customer: { name: { contains: q, mode: "insensitive" } },
+                    },
+                  },
+                },
+              ],
+            }
+          : {},
+      ],
+    },
     include: { invoice: { include: { job: { include: { customer: true } } } } },
     orderBy: { createdAt: "desc" },
   });
@@ -16,6 +49,9 @@ export default async function PaymentsPage() {
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold text-black">Payments</h1>
+
+      <PaymentsTabs currentStatus={status} />
+      <PaymentsSearch currentQuery={q} />
 
       <form
         action={createPayment}

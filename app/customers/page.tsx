@@ -1,15 +1,34 @@
 import { prisma } from "@/lib/prisma";
 import { createCustomer } from "./actions";
 import { CustomerRow } from "./CustomerRow";
+import CustomersSearch from "./CustomersSearch";
 
-export default async function CustomersPage() {
+export default async function CustomersPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ q?: string }>;
+}) {
+  const params = await searchParams;
+  const q = params?.q || "";
+
   const customers = await prisma.customer.findMany({
+    where: q
+      ? {
+          OR: [
+            { name: { contains: q, mode: "insensitive" } },
+            { phone: { contains: q, mode: "insensitive" } },
+            { email: { contains: q, mode: "insensitive" } },
+          ],
+        }
+      : {},
     orderBy: { createdAt: "desc" },
   });
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold text-black">Customers</h1>
+
+      <CustomersSearch currentQuery={q} />
 
       <form
         action={createCustomer}

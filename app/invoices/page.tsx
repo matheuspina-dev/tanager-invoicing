@@ -1,9 +1,36 @@
 import { prisma } from "@/lib/prisma";
 import { createInvoice } from "./actions";
 import { InvoiceRow } from "./InvoiceRow";
+import InvoicesTabs from "./InvoicesTabs";
+import InvoicesSearch from "./InvoicesSearch";
 
-export default async function InvoicesPage() {
+export default async function InvoicesPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ status?: string; q?: string }>;
+}) {
+  const params = await searchParams;
+  const status = params?.status || "ALL";
+  const q = params?.q || "";
+
   const invoices = await prisma.invoice.findMany({
+    where: {
+      AND: [
+        status !== "ALL" ? { status } : {},
+        q
+          ? {
+              OR: [
+                { job: { description: { contains: q, mode: "insensitive" } } },
+                {
+                  job: {
+                    customer: { name: { contains: q, mode: "insensitive" } },
+                  },
+                },
+              ],
+            }
+          : {},
+      ],
+    },
     include: { job: { include: { customer: true } } },
     orderBy: { createdAt: "desc" },
   });
@@ -16,6 +43,9 @@ export default async function InvoicesPage() {
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold text-black">Invoices</h1>
+
+      <InvoicesTabs currentStatus={status} />
+      <InvoicesSearch currentQuery={q} />
 
       <form
         action={createInvoice}

@@ -1,8 +1,11 @@
 "use client";
-
 import { useRouter } from "next/navigation";
 
-export default function JobsTabs({ currentStatus }: { currentStatus: string }) {
+export default function PaymentsTabs({
+  currentStatus,
+}: {
+  currentStatus: string;
+}) {
   const router = useRouter();
 
   function setStatus(value: string) {
@@ -15,7 +18,7 @@ export default function JobsTabs({ currentStatus }: { currentStatus: string }) {
 
   return (
     <div className="flex gap-2 mb-4">
-      {["OPEN", "IN_PROGRESS", "CLOSED", "ALL"].map((s) => (
+      {["UNPAID", "IN_PROGRESS", "PAID", "ALL"].map((s) => (
         <button
           key={s}
           onClick={() => setStatus(s)}
