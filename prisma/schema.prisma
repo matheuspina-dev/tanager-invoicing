@@ -20,8 +20,10 @@ model Job {
   id          String   @id @default(cuid())
   description String
   status      String   @default("OPEN")
-  customerId  String
-  customer    Customer @relation(fields: [customerId], references: [id])
+
+  customerId  String?
+  customer    Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  
   invoices    Invoice[]
   createdAt   DateTime @default(now())
 }

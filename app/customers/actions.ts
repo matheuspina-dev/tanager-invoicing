@@ -25,6 +25,8 @@ export async function createCustomer(formData: FormData) {
 
 export async function updateCustomer(formData: FormData) {
   const id = formData.get("id") as string;
+  if (!id) throw new Error("Customer ID required");
+
   const name = formData.get("name") as string;
   const phone = formData.get("phone") as string | null;
   const email = formData.get("email") as string | null;
@@ -39,6 +41,38 @@ export async function updateCustomer(formData: FormData) {
 
 export async function deleteCustomer(formData: FormData) {
   const id = formData.get("id") as string;
+  if (!id) throw new Error("Customer ID required");
+
+  const blocked = await prisma.customer.findFirst({
+    where: {
+      id,
+      OR: [
+        {
+          jobs: {
+            some: {
+              status: { in: ["OPEN", "IN_PROGRESS"] },
+            },
+          },
+        },
+        {
+          jobs: {
+            some: {
+              invoices: {
+                some: {
+                  status: { in: ["UNPAID", "IN_PROGRESS"] },
+                },
+              },
+            },
+          },
+        },
+      ],
+    },
+  });
+
+  if (blocked)
+    throw new Error(
+      "This customer has active jobs or unpaid invoices. Close them first"
+    );
 
   await prisma.customer.delete({ where: { id } });
 

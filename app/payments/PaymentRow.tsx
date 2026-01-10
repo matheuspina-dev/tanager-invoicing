@@ -16,7 +16,11 @@ export function PaymentRow({ payment }: { payment: any }) {
             </p>
 
             <p className="text-sm text-gray-700">
-              Customer: {payment.invoice.job.customer.name} - Method:
+              Customer:
+              {payment.invoice.job.customer
+                ? payment.invoice.job.customer.name
+                : " Customer deleted "}
+              - Method:
               {payment.method} - Status: {payment.invoice.status}
             </p>
           </div>

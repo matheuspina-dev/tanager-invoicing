@@ -13,7 +13,9 @@ export function JobRow({ job }: { job: any }) {
           <div>
             <p className="font-semibold text-black">{job.description}</p>
             <p className="text-sm text-gray-700">
-              Customer: {job.customer.name} - Status: {job.status}
+              Customer:
+              {job.customer ? job.customer.name : " Deleted customer"} - Status:{" "}
+              {job.status}
             </p>
           </div>
 

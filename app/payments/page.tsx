@@ -38,8 +38,11 @@ export default async function PaymentsPage() {
             <option value="">Select Invoice</option>
             {invoices.map((invoice) => (
               <option key={invoice.id} value={invoice.id}>
-                {invoice.job.description} (Customer: {invoice.job.customer.name}
-                ) - ${invoice.amount} - {invoice.status}
+                {invoice.job.description}{" "}
+                {invoice.job.customer
+                  ? `Customer: ${invoice.job.customer.name}`
+                  : "Deleted customer"}
+                - ${invoice.amount} - {invoice.status}
               </option>
             ))}
           </select>

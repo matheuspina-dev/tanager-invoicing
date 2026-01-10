@@ -16,7 +16,11 @@ export function InvoiceRow({ invoice }: { invoice: any }) {
             </p>
 
             <p className="text-sm text-gray-700">
-              Customer: {invoice.job.customer.name} - Status: {invoice.status}
+              Customer:
+              {invoice.job.customer
+                ? invoice.job.customer.name
+                : " Deleted customer"}{" "}
+              - Status: {invoice.status}
             </p>
           </div>
 

@@ -38,7 +38,10 @@ export default async function InvoicesPage() {
             <option value="">Select Job</option>
             {jobs.map((job) => (
               <option key={job.id} value={job.id}>
-                {job.description} (Customer: {job.customer.name})
+                {job.description}{" "}
+                {job.customer
+                  ? `Customer: ${job.customer.name}`
+                  : "Deleted customer"}
               </option>
             ))}
           </select>

@@ -29,7 +29,15 @@ export function CustomerRow({ customer }: { customer: any }) {
               Edit
             </button>
 
-            <form action={deleteCustomer}>
+            <form
+              action={async (formData) => {
+                try {
+                  await deleteCustomer(formData);
+                } catch (err: any) {
+                  alert(err.message);
+                }
+              }}
+            >
               <input type="hidden" name="id" value={customer.id} />
               <button
                 type="submit"
