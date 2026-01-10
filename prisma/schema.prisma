@@ -1,0 +1,46 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?
+  email     String?
+  jobs      Job[]
+  createdAt DateTime @default(now())
+}
+
+model Job {
+  id          String   @id @default(cuid())
+  description String
+  status      String   @default("OPEN")
+  customerId  String
+  customer    Customer @relation(fields: [customerId], references: [id])
+  invoices    Invoice[]
+  createdAt   DateTime @default(now())
+}
+
+model Invoice {
+  id        String    @id @default(cuid())
+  amount    Int
+  status    String    @default("UNPAID")
+  jobId     String
+  job       Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  payments  Payment[]
+  createdAt DateTime  @default(now())
+}
+
+model Payment {
+  id        String   @id @default(cuid())
+  amount    Int
+  method    String
+  invoiceId String
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
