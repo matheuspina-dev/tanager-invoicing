@@ -1,11 +1,15 @@
 "use client";
 import { useRouter } from "next/navigation";
 
-export default function InvoicesTabs({
-  currentStatus,
-}: {
+interface StatusTabsProps {
   currentStatus: string;
-}) {
+  statuses: string[];
+}
+
+export default function StatusTabs({
+  currentStatus,
+  statuses,
+}: StatusTabsProps) {
   const router = useRouter();
 
   function setStatus(value: string) {
@@ -18,7 +22,7 @@ export default function InvoicesTabs({
 
   return (
     <div className="flex gap-2 mb-4">
-      {["UNPAID", "IN_PROGRESS", "PAID", "ALL"].map((s) => (
+      {statuses.map((s) => (
         <button
           key={s}
           onClick={() => setStatus(s)}

@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { createPayment } from "./actions";
 import { PaymentRow } from "./PaymentRow";
-import PaymentsTabs from "./PaymentsTabs";
-import PaymentsSearch from "./PaymentsSearch";
+import SearchInput from "../components/SearchInput";
+import StatusTabs from "../components/StatusTabs";
 
 export default async function PaymentsPage({
   searchParams,
@@ -50,8 +50,14 @@ export default async function PaymentsPage({
     <div className="max-w-3xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold text-black">Payments</h1>
 
-      <PaymentsTabs currentStatus={status} />
-      <PaymentsSearch currentQuery={q} />
+      <StatusTabs
+        currentStatus={status}
+        statuses={["UNPAID", "IN_PROGRESS", "PAID", "ALL"]}
+      />
+      <SearchInput
+        currentQuery={q}
+        placeholder="Search by job or customer..."
+      />
 
       <form
         action={createPayment}

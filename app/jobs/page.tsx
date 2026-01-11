@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { createJob } from "./actions";
-import JobsTabs from "./JobsTabs";
-import JobsSearch from "./JobsSearch";
 import { JobRow } from "./JobRow";
+import SearchInput from "../components/SearchInput";
+import StatusTabs from "../components/StatusTabs";
 
 export default async function JobsPage({
   searchParams,
@@ -10,7 +10,6 @@ export default async function JobsPage({
   searchParams?: Promise<{ status?: string; q?: string }>;
 }) {
   const params = await searchParams;
-
   const status = params?.status || "ALL";
   const q = params?.q || "";
 
@@ -40,8 +39,11 @@ export default async function JobsPage({
     <div className="max-w-3xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold text-black">Jobs</h1>
 
-      <JobsTabs currentStatus={status} />
-      <JobsSearch currentQuery={q} />
+      <StatusTabs
+        currentStatus={status}
+        statuses={["OPEN", "IN_PROGRESS", "CLOSED", "ALL"]}
+      />
+      <SearchInput currentQuery={q} placeholder="Search jobs or customers..." />
 
       <form
         action={createJob}

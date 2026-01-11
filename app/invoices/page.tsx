@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { createInvoice } from "./actions";
 import { InvoiceRow } from "./InvoiceRow";
-import InvoicesTabs from "./InvoicesTabs";
-import InvoicesSearch from "./InvoicesSearch";
+import SearchInput from "../components/SearchInput";
+import StatusTabs from "../components/StatusTabs";
 
 export default async function InvoicesPage({
   searchParams,
@@ -44,8 +44,14 @@ export default async function InvoicesPage({
     <div className="max-w-3xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold text-black">Invoices</h1>
 
-      <InvoicesTabs currentStatus={status} />
-      <InvoicesSearch currentQuery={q} />
+      <StatusTabs
+        currentStatus={status}
+        statuses={["UNPAID", "IN_PROGRESS", "PAID", "ALL"]}
+      />
+      <SearchInput
+        currentQuery={q}
+        placeholder="Search by job or customer..."
+      />
 
       <form
         action={createInvoice}

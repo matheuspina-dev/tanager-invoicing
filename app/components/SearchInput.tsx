@@ -1,13 +1,16 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function CustomersSearch({
-  currentQuery,
-}: {
+interface SearchInputProps {
+  placeholder?: string;
   currentQuery: string;
-}) {
+}
+
+export default function SearchInput({
+  placeholder = "Search...",
+  currentQuery,
+}: SearchInputProps) {
   const router = useRouter();
   const [value, setValue] = useState(currentQuery);
 
@@ -22,10 +25,10 @@ export default function CustomersSearch({
 
   return (
     <input
-      placeholder="Search by name, phone or email..."
+      placeholder={placeholder}
       value={value}
       onChange={onChange}
-      className="w-full mb-4 border rounded px-3 py-2"
+      className="w-full mb-4 border rounded px-3 py-2 placeholder-gray-600 text-gray-600"
     />
   );
 }

@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { createCustomer } from "./actions";
 import { CustomerRow } from "./CustomerRow";
-import CustomersSearch from "./CustomersSearch";
+import SearchInput from "../components/SearchInput";
 
 export default async function CustomersPage({
   searchParams,
@@ -28,7 +28,10 @@ export default async function CustomersPage({
     <div className="max-w-3xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold text-black">Customers</h1>
 
-      <CustomersSearch currentQuery={q} />
+      <SearchInput
+        currentQuery={q}
+        placeholder="Search by name, phone or email..."
+      />
 
       <form
         action={createCustomer}
