@@ -121,6 +121,7 @@ export async function emailInvoice(invoiceId: string) {
       job: { include: { customer: true } },
       payments: true,
       items: true,
+      company: true,
     },
   });
 

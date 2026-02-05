@@ -1,19 +1,25 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { generateInvoicePdf } from "../../pdf";
+import { requireCompanyId } from "@/lib/auth";
 
 export async function GET(
   _req: Request,
   context: { params: Promise<{ id: string }> },
 ) {
+  const companyId = await requireCompanyId();
+
   const { id } = await context.params;
 
   if (!id) {
     return new NextResponse("Missing invoice ID", { status: 400 });
   }
 
-  const invoice = await prisma.invoice.findUnique({
-    where: { id },
+  const invoice = await prisma.invoice.findFirst({
+    where: {
+      id,
+      companyId,
+    },
     include: {
       job: {
         include: {
@@ -22,6 +28,7 @@ export async function GET(
       },
       items: true,
       payments: true,
+      company: true,
     },
   });
 

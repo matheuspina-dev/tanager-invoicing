@@ -11,18 +11,28 @@ export default function DashboardShell({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Optional: auto-close sidebar on small screens
   useEffect(() => {
-    if (window.innerWidth < 766) setSidebarOpen(false);
+    const handleResize = () => {
+      if (window.innerWidth < 1024) setSidebarOpen(false);
+      else setSidebarOpen(true);
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-bgLight text-textLight transition-colors duration-300">
-      <Sidebar open={sidebarOpen} />
+    <div className="flex h-screen overflow-hidden bg-gray-50">
+      <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />
 
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 overflow-hidden">
         <TopBar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-        <main className="flex-1 p-6">{children}</main>
+
+        <main className="flex-1 overflow-auto p-4 md:p-8">
+          <div className="max-w-5xl mx-auto">{children}</div>
+        </main>
       </div>
     </div>
   );

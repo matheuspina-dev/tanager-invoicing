@@ -21,20 +21,26 @@ export default function StatusTabs({
   }
 
   return (
-    <div className="flex gap-2 mb-4">
-      {statuses.map((s) => (
-        <button
-          key={s}
-          onClick={() => setStatus(s)}
-          className={`px-4 py-2 rounded cursor-pointer ${
-            currentStatus === s
-              ? "bg-blue-600 text-white hover:bg-blue-700"
-              : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-          }`}
-        >
-          {s.replace("_", " ")}
-        </button>
-      ))}
+    <div className="flex flex-wrap gap-2 mb-6 p-1 bg-gray-100/50 rounded-lg w-fit">
+      {statuses.map((s) => {
+        const isActive = currentStatus === s;
+        return (
+          <button
+            key={s}
+            onClick={() => setStatus(s)}
+            className={`
+              px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200
+              ${
+                isActive
+                  ? "bg-white text-blue-600 shadow-sm ring-1 ring-black/5"
+                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
+              }
+            `}
+          >
+            {s.replace("_", " ")}
+          </button>
+        );
+      })}
     </div>
   );
 }

@@ -76,6 +76,12 @@ model Company {
   id        String     @id @default(cuid())
   name      String
   code      String     @unique @default(cuid())
+
+  address   String?
+  email     String?
+  phone     String?
+  website   String?
+
   users     User[]
   customers Customer[]
   jobs      Job[]

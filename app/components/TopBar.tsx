@@ -2,6 +2,7 @@
 
 import UserMenu from "./UserMenu";
 import { usePathname } from "next/navigation";
+import { Menu } from "lucide-react";
 
 const pageTitles: { [key: string]: string } = {
   "/dashboard": "Dashboard",
@@ -9,6 +10,7 @@ const pageTitles: { [key: string]: string } = {
   "/invoices": "Invoices",
   "/jobs": "Jobs",
   "/payments": "Payments",
+  "/settings": "Company Settings",
 };
 
 export default function TopBar({
@@ -23,18 +25,23 @@ export default function TopBar({
     )?.[1] || "Dashboard";
 
   return (
-    <header className="h-16 border-b flex items-center px-4 justify-between bg-background-light">
+    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-10">
       <div className="flex items-center gap-4">
         <button
           onClick={onToggleSidebar}
-          className="p-2 rounded hover:bg-gray-200 cursor-pointer"
+          className="md:hidden p-2 rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700"
         >
-          ☰
+          <Menu size={20} />
         </button>
-        <span className="font-semibold">{pageTitle}</span>
+
+        <h1 className="text-xl font-semibold text-gray-800 tracking-tight">
+          {pageTitle}
+        </h1>
       </div>
 
-      <UserMenu />
+      <div className="flex items-center gap-4">
+        <UserMenu />
+      </div>
     </header>
   );
 }
