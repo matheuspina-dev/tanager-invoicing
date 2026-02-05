@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { updateInvoice, deleteInvoice } from "./actions";
+import { updateInvoice, deleteInvoice, emailInvoice } from "./actions";
 
 export function InvoiceRow({ invoice }: { invoice: any }) {
   const [editing, setEditing] = useState(false);
@@ -25,6 +25,23 @@ export function InvoiceRow({ invoice }: { invoice: any }) {
           </div>
 
           <div className="flex gap-2">
+            <a
+              href={`/invoices/${invoice.id}/pdf`}
+              target="_blank"
+              className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+            >
+              PDF
+            </a>
+
+            <form
+              action={async () => {
+                await emailInvoice(invoice.id);
+                alert("Invoice sent!");
+              }}
+            >
+              <button type="submit">Send Invoice</button>
+            </form>
+
             <button
               onClick={() => setEditing(true)}
               className="px-3 py-1 rounded bg-gray-200 text-gray-600 hover:bg-gray-300 cursor-pointer"

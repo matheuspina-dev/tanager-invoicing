@@ -1,26 +1,39 @@
 import { prisma } from "@/lib/prisma";
 import { createCustomer } from "./actions";
 import { CustomerRow } from "./CustomerRow";
-import SearchInput from "../components/SearchInput";
+import SearchInput from "@/app/components/SearchInput";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 export default async function CustomersPage({
   searchParams,
 }: {
   searchParams?: Promise<{ q?: string }>;
 }) {
+  // Get current user session on the server
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id || !session.user.companyId) {
+    throw new Error("Unauthorized");
+  }
+
+  const companyId = session.user.companyId;
+
   const params = await searchParams;
   const q = params?.q || "";
 
   const customers = await prisma.customer.findMany({
-    where: q
-      ? {
-          OR: [
-            { name: { contains: q, mode: "insensitive" } },
-            { phone: { contains: q, mode: "insensitive" } },
-            { email: { contains: q, mode: "insensitive" } },
-          ],
-        }
-      : {},
+    where: {
+      companyId,
+      ...(q
+        ? {
+            OR: [
+              { name: { contains: q, mode: "insensitive" } },
+              { phone: { contains: q, mode: "insensitive" } },
+              { email: { contains: q, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+    },
     orderBy: { createdAt: "desc" },
   });
 

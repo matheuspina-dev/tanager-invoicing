@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { createPayment } from "./actions";
 import { PaymentRow } from "./PaymentRow";
-import SearchInput from "../components/SearchInput";
-import StatusTabs from "../components/StatusTabs";
+import SearchInput from "../../components/SearchInput";
+import StatusTabs from "../../components/StatusTabs";
 
 export default async function PaymentsPage({
   searchParams,

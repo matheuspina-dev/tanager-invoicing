@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { createInvoice } from "./actions";
 import { InvoiceRow } from "./InvoiceRow";
-import SearchInput from "../components/SearchInput";
-import StatusTabs from "../components/StatusTabs";
+import SearchInput from "../../components/SearchInput";
+import StatusTabs from "../../components/StatusTabs";
+import InvoiceItemsForm from "./InvoiceItemForm";
 
 export default async function InvoicesPage({
   searchParams,
@@ -57,13 +58,7 @@ export default async function InvoicesPage({
         action={createInvoice}
         className="bg-white p-4 rounded-lg border-gray-100 space-y-3"
       >
-        <input
-          type="number"
-          name="amount"
-          placeholder="Amount"
-          required
-          className="bg-white p-4 rounded-lg border placeholder-gray-600 text-gray-600 space-y-3 w-full"
-        />
+        <InvoiceItemsForm />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <select

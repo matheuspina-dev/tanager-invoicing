@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { createJob } from "./actions";
 import { JobRow } from "./JobRow";
-import SearchInput from "../components/SearchInput";
-import StatusTabs from "../components/StatusTabs";
+import SearchInput from "../../components/SearchInput";
+import StatusTabs from "../../components/StatusTabs";
 
 export default async function JobsPage({
   searchParams,

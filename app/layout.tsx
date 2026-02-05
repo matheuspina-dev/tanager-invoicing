@@ -1,10 +1,5 @@
 import "./globals.css";
-import DashboardShell from "./components/DashboardShell";
-
-export const metadata = {
-  title: "Tanager Invoicing",
-  description: "Manage Jobs, Customers, Invoices, and Payments",
-};
+import { Providers } from "./providers";
 
 export default function RootLayout({
   children,
@@ -13,8 +8,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <DashboardShell>{children}</DashboardShell>
+      <body suppressHydrationWarning={true}>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
