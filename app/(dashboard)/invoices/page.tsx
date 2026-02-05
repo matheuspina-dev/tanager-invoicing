@@ -4,18 +4,22 @@ import { InvoiceRow } from "./InvoiceRow";
 import SearchInput from "../../components/SearchInput";
 import StatusTabs from "../../components/StatusTabs";
 import InvoiceItemsForm from "./InvoiceItemForm";
+import { requireCompanyId } from "@/lib/auth";
 
 export default async function InvoicesPage({
   searchParams,
 }: {
   searchParams?: Promise<{ status?: string; q?: string }>;
 }) {
+  const companyId = await requireCompanyId();
+
   const params = await searchParams;
   const status = params?.status || "ALL";
   const q = params?.q || "";
 
   const invoices = await prisma.invoice.findMany({
     where: {
+      companyId,
       AND: [
         status !== "ALL" ? { status } : {},
         q
@@ -32,11 +36,15 @@ export default async function InvoicesPage({
           : {},
       ],
     },
-    include: { job: { include: { customer: true } } },
+    include: {
+      job: { include: { customer: true } },
+      items: true,
+    },
     orderBy: { createdAt: "desc" },
   });
 
   const jobs = await prisma.job.findMany({
+    where: { companyId },
     include: { customer: true },
     orderBy: { description: "asc" },
   });

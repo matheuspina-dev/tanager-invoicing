@@ -1,4 +1,5 @@
 import { getServerSession, type AuthOptions } from "next-auth";
+import { redirect } from "next/navigation";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import bcrypt from "bcrypt";
@@ -64,3 +65,13 @@ export const authOptions: AuthOptions = {
 };
 
 export const auth = () => getServerSession(authOptions);
+
+export async function requireCompanyId() {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id || !session.user.companyId) {
+    redirect("/login");
+  }
+
+  return session.user.companyId;
+}

@@ -2,21 +2,14 @@ import { prisma } from "@/lib/prisma";
 import { createCustomer } from "./actions";
 import { CustomerRow } from "./CustomerRow";
 import SearchInput from "@/app/components/SearchInput";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { requireCompanyId } from "@/lib/auth";
 
 export default async function CustomersPage({
   searchParams,
 }: {
   searchParams?: Promise<{ q?: string }>;
 }) {
-  // Get current user session on the server
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id || !session.user.companyId) {
-    throw new Error("Unauthorized");
-  }
-
-  const companyId = session.user.companyId;
+  const companyId = await requireCompanyId();
 
   const params = await searchParams;
   const q = params?.q || "";

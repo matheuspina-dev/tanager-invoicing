@@ -3,18 +3,22 @@ import { createJob } from "./actions";
 import { JobRow } from "./JobRow";
 import SearchInput from "../../components/SearchInput";
 import StatusTabs from "../../components/StatusTabs";
+import { requireCompanyId } from "@/lib/auth";
 
 export default async function JobsPage({
   searchParams,
 }: {
   searchParams?: Promise<{ status?: string; q?: string }>;
 }) {
+  const companyId = await requireCompanyId();
+
   const params = await searchParams;
   const status = params?.status || "ALL";
   const q = params?.q || "";
 
   const jobs = await prisma.job.findMany({
     where: {
+      companyId,
       AND: [
         status !== "ALL" ? { status } : {},
         q
@@ -32,6 +36,7 @@ export default async function JobsPage({
   });
 
   const customers = await prisma.customer.findMany({
+    where: { companyId },
     orderBy: { name: "asc" },
   });
 

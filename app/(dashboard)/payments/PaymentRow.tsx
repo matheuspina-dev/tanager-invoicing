@@ -6,29 +6,44 @@ import { updatePayment, deletePayment } from "./actions";
 export function PaymentRow({ payment }: { payment: any }) {
   const [editing, setEditing] = useState(false);
 
+  const methodColors: Record<string, string> = {
+    CASH: "bg-green-100 text-green-800",
+    CARD: "bg-purple-100 text-purple-800",
+    OTHER: "bg-gray-100 text-gray-800",
+  };
+
   return (
-    <li className="bg-white border rounded-lg p-4">
+    <li className="bg-white border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
       {!editing ? (
         <div className="flex justify-between items-center">
           <div>
-            <p className="font-semibold text-black">
-              {payment.invoice.job.description} - {payment.amount}
+            <div className="flex items-center gap-3">
+              <span className="font-bold text-xl text-black">
+                ${(payment.amount / 100).toFixed(2)}
+              </span>
+              <span
+                className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full font-bold ${
+                  methodColors[payment.method] || "bg-gray-100"
+                }`}
+              >
+                {payment.method}
+              </span>
+            </div>
+
+            <p className="font-medium text-gray-800 mt-1">
+              {payment.invoice.job.description}
             </p>
 
-            <p className="text-sm text-gray-700">
-              Customer:
-              {payment.invoice.job.customer
-                ? payment.invoice.job.customer.name
-                : " Customer deleted "}
-              - Method:
-              {payment.method} - Status: {payment.invoice.status}
+            <p className="text-xs text-gray-500">
+              Customer: {payment.invoice.job.customer?.name || "Deleted"} •
+              Invoice Status: {payment.invoice.status}
             </p>
           </div>
 
           <div className="flex gap-2">
             <button
               onClick={() => setEditing(true)}
-              className="px-3 py-1 rounded bg-gray-200 text-gray-600 hover:bg-gray-300 cursor-pointer"
+              className="px-3 py-1 text-sm rounded bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
             >
               Edit
             </button>
@@ -40,7 +55,7 @@ export function PaymentRow({ payment }: { payment: any }) {
                 onClick={(e) => {
                   if (!confirm("Delete this payment?")) e.preventDefault();
                 }}
-                className="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700 cursor-pointer"
+                className="px-3 py-1 text-sm rounded bg-white border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
               >
                 Delete
               </button>
@@ -53,42 +68,58 @@ export function PaymentRow({ payment }: { payment: any }) {
             await updatePayment(formData);
             setEditing(false);
           }}
-          className="space-y-3"
+          className="space-y-4"
         >
           <input type="hidden" name="id" value={payment.id} />
 
-          <input
-            type="number"
-            name="amount"
-            defaultValue={payment.amount}
-            className="bg-white p-4 rounded-lg border placeholder-gray-600 text-gray-600 space-y-3 w-full"
-          />
+          <div className="flex justify-between items-center bg-gray-50 p-2 rounded">
+            <span className="font-semibold text-gray-700 text-sm">
+              Edit Payment
+            </span>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setEditing(false)}
+                className="text-xs text-gray-500 hover:underline"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="text-xs text-green-600 font-semibold hover:underline"
+              >
+                Save
+              </button>
+            </div>
+          </div>
 
-          <select
-            name="method"
-            defaultValue={payment.method}
-            className="border placeholder-gray-600 text-gray-600 rounded px-3 py-2 w-full"
-          >
-            <option value="CASH">CASH</option>
-            <option value="CARD">CARD</option>
-            <option value="OTHER">OTHER</option>
-          </select>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs text-gray-500 font-medium">
+                Amount (Cents)
+              </label>
+              <input
+                type="number"
+                name="amount"
+                defaultValue={payment.amount}
+                className="w-full border rounded px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              />
+            </div>
 
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 cursor-pointer"
-            >
-              Save
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setEditing(false)}
-              className="bg-gray-200 px-4 py-2 text-gray-600 rounded hover:bg-gray-300 cursor-pointer"
-            >
-              Cancel
-            </button>
+            <div>
+              <label className="text-xs text-gray-500 font-medium">
+                Method
+              </label>
+              <select
+                name="method"
+                defaultValue={payment.method}
+                className="w-full border rounded px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              >
+                <option value="CASH">CASH</option>
+                <option value="CARD">CARD</option>
+                <option value="OTHER">OTHER</option>
+              </select>
+            </div>
           </div>
         </form>
       )}

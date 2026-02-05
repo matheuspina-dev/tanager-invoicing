@@ -60,15 +60,43 @@ export async function updateInvoice(formData: FormData) {
   const invoice = await prisma.invoice.findFirst({ where: { id, companyId } });
   if (!invoice) throw new Error("Invoice not found");
 
-  const amount = parseInt(
-    formData.get("amount")?.toString() || invoice.amount.toString(),
-  );
   const status = formData.get("status")?.toString() || invoice.status;
 
-  await prisma.invoice.update({
-    where: { id: invoice.id },
-    data: { amount, status },
+  const items: { description: string; price: number }[] = [];
+  for (let i = 0; ; i++) {
+    const description = formData
+      .get(`items[${i}][description]`)
+      ?.toString()
+      .trim();
+    const priceRaw = formData.get(`items[${i}][price]`)?.toString();
+
+    if (!description || !priceRaw) break;
+
+    const price = parseInt(priceRaw, 10);
+    if (!isNaN(price) && price > 0) {
+      items.push({ description, price });
+    }
+  }
+
+  const newAmount = items.reduce((sum, item) => sum + item.price, 0);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.invoiceItem.deleteMany({
+      where: { invoiceId: id },
+    });
+
+    await tx.invoice.update({
+      where: { id },
+      data: {
+        status,
+        amount: newAmount,
+        items: {
+          create: items,
+        },
+      },
+    });
   });
+
   revalidatePath("/invoices");
 }
 

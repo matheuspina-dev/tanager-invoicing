@@ -3,18 +3,22 @@ import { createPayment } from "./actions";
 import { PaymentRow } from "./PaymentRow";
 import SearchInput from "../../components/SearchInput";
 import StatusTabs from "../../components/StatusTabs";
+import { requireCompanyId } from "@/lib/auth";
 
 export default async function PaymentsPage({
   searchParams,
 }: {
   searchParams?: Promise<{ status?: string; q?: string }>;
 }) {
+  const companyId = await requireCompanyId();
+
   const params = await searchParams;
   const status = params?.status || "ALL";
   const q = params?.q || "";
 
   const payments = await prisma.payment.findMany({
     where: {
+      companyId,
       AND: [
         status !== "ALL" ? { invoice: { status } } : {},
         q
@@ -42,6 +46,7 @@ export default async function PaymentsPage({
   });
 
   const invoices = await prisma.invoice.findMany({
+    where: { companyId },
     include: { job: { include: { customer: true } } },
     orderBy: { createdAt: "desc" },
   });
