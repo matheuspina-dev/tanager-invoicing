@@ -344,3 +344,10 @@ export async function generateInvoicePdf(invoice: any) {
 
   return Buffer.from(await pdf.save());
 }
+
+/* • Power Steering Pump ($378.97)
+• Accessory Drive Belt ($83.66)
+• Power Steering Fluid - 3 QT ($35.43)
+• Engine Oil - 5 QT ($20.97)
+• Engine Oil Filter ($8.97)
+• Labor - 8 Hours ($400.00)* */

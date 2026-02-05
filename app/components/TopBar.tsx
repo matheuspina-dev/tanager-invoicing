@@ -11,6 +11,7 @@ const pageTitles: { [key: string]: string } = {
   "/jobs": "Jobs",
   "/payments": "Payments",
   "/settings": "Company Settings",
+  "/profile": "My Profile",
 };
 
 export default function TopBar({

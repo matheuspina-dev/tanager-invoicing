@@ -118,7 +118,7 @@ export default function RegisterPage() {
                 setMode("owner");
                 setError(null);
               }}
-              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
+              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all px-1 ${
                 mode === "owner"
                   ? "bg-white text-gray-900 shadow-sm"
                   : "text-gray-500 hover:text-gray-900"

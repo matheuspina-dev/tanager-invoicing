@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Tanager Invoicing 🚀
 
-## Getting Started
+Professional Service & Invoicing Management Platform
+Tanager Invoicing is a robust, multi-tenant web application designed for small to medium-sized service businesses. It streamlines the entire workflow from customer acquisition and job tracking to professional PDF invoicing and payment recording.
 
-First, run the development server:
+✨ Key Features
+🏢 Multi-Tenant Infrastructure
+Company Isolation: Strict data partitioning ensures that users only ever see data belonging to their specific company.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Role-Based Access: Built-in support for Owners (full company control) and Employees (operational access).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Invite System: Owners generate unique 6-character Company Codes to securely onboard their team members.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+📋 Operational Management
+Job Tracking: Manage the lifecycle of service requests with status stages (Open, In Progress, Closed).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+CRM (Customer Management): Centralized database for customer contact details and service history.
 
-## Learn More
+Payment Tracking: Record partial or full payments against invoices with support for various methods (Cash, Card, etc.).
 
-To learn more about Next.js, take a look at the following resources:
+📄 Dynamic PDF Invoicing
+Professional Templates: Automatically generates clean, professional PDF invoices using pdf-lib.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Dynamic Layouts: Intelligent text-wrapping for long job descriptions to prevent layout overlap.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Auto-Calculations: Real-time balance and status updates (Unpaid, In Progress, Paid) based on recorded payments.
 
-## Deploy on Vercel
+Company Branding: Invoices automatically pull your company's address, phone, and logo details from your settings.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+🔒 Security & Auth
+Secure Authentication: Powered by NextAuth.js with JWT strategy.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Password Protection: Industry-standard hashing via bcrypt.
+
+Password Reset: Complete "Forgot Password" flow with secure email tokens.
+
+🛠️ Tech Stack
+Framework: Next.js 16.1 (App Router)
+
+Language: TypeScript
+
+Database: PostgreSQL (via Prisma ORM)
+
+Package Manager: pnpm
+
+Authentication: NextAuth.js
+
+Styling: Tailwind CSS
+
+PDF Generation: pdf-lib
+
+Icons: Lucide React
+
+🚀 Getting Started
+
+1. Prerequisites
+   Node.js: 22.16.0 or higher
+
+   pnpm: npm install -g pnpm
+
+   PostgreSQL: A running instance (local or hosted)
+
+2. Installation
+
+   # Clone the repository
+
+   git clone https://github.com/matheuspina-dev/tanager-invoicing.git
+
+   # Install dependencies
+
+   pnpm install
+
+   # Set up environment variables
+
+   cp .env.example .env
+
+3. Environment Variables
+   Configure your .env file:
+
+   DATABASE_URL="postgresql://user:password@localhost:5432/serviceflow"
+   NEXTAUTH_SECRET="your-random-secret-key"
+   NEXTAUTH_URL="http://localhost:3000"
+   NEXT_PUBLIC_URL="http://localhost:3000"
+
+   # Email Settings (SMTP)
+
+   EMAIL_SERVER_HOST="smtp.example.com"
+   EMAIL_SERVER_PORT=587
+   EMAIL_SERVER_USER="user@example.com"
+   EMAIL_SERVER_PASSWORD="password"
+   EMAIL_FROM="user@example.com"
+
+4. Database Setup
+
+   # Sync schema and generate Prisma client
+
+   pnpm prisma db push
+   pnpm prisma generate
+
+5. Run the App
+   pnpm dev
+
+📐 Application Architecture
+The application is architected around a Multi-Tenant Server Actions pattern. Every query is scoped via a companyId retrieved from the secure JWT session.
+
+Shared Database: All companies live in one database.
+
+Row-Level Filtering: Middleware and helper functions (requireCompanyId) ensure that where: { companyId } is applied to every single Prisma call.
+
+Server Components: Fetches data directly on the server for maximum performance and SEO.
+
+📝 License
+Distributed under the MIT License.
