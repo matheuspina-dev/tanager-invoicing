@@ -1,113 +1,148 @@
-Tanager Invoicing 🚀
+<div align="center">
+  <img src="https://placehold.co/120x120/2563eb/white?text=TI" alt="Tanager Invoicing Logo" width="120" height="120" style="border-radius: 20px" />
 
-Professional Service & Invoicing Management Platform
-Tanager Invoicing is a robust, multi-tenant web application designed for small to medium-sized service businesses. It streamlines the entire workflow from customer acquisition and job tracking to professional PDF invoicing and payment recording.
+# Tanager Invoicing 🚀
 
-✨ Key Features
-🏢 Multi-Tenant Infrastructure
-Company Isolation: Strict data partitioning ensures that users only ever see data belonging to their specific company.
+**Professional Multi-Tenant Service & Invoicing Management Platform**
 
-Role-Based Access: Built-in support for Owners (full company control) and Employees (operational access).
+  <p>
+    An all-in-one solution for service businesses to manage jobs, track customers, <br/> 
+    and generate professional PDF invoices with automated payment tracking.
+  </p>
 
-Invite System: Owners generate unique 6-character Company Codes to securely onboard their team members.
+  <p>
+    <img src="https://img.shields.io/badge/Next.js-16.1-black?style=flat-square&logo=next.js" />
+    <img src="https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript" />
+    <img src="https://img.shields.io/badge/PostgreSQL-15+-336791?style=flat-square&logo=postgresql" />
+    <img src="https://img.shields.io/badge/Prisma-ORM-2d3748?style=flat-square&logo=prisma" />
+    <img src="https://img.shields.io/badge/Node.js-22.16.0-339933?style=flat-square&logo=nodedotjs" />
+    <img src="https://img.shields.io/badge/pnpm-9.x-F69220?style=flat-square&logo=pnpm" />
+  </p>
 
-📋 Operational Management
-Job Tracking: Manage the lifecycle of service requests with status stages (Open, In Progress, Closed).
+<a href="#-key-features">Key Features</a> •
+<a href="#-getting-started">Getting Started</a> •
+<a href="#-architecture">Architecture</a> •
+<a href="#-license">License</a>
 
-CRM (Customer Management): Centralized database for customer contact details and service history.
+</div>
 
-Payment Tracking: Record partial or full payments against invoices with support for various methods (Cash, Card, etc.).
+<br />
 
-📄 Dynamic PDF Invoicing
-Professional Templates: Automatically generates clean, professional PDF invoices using pdf-lib.
+## 📸 Overview
 
-Dynamic Layouts: Intelligent text-wrapping for long job descriptions to prevent layout overlap.
+|                                              **Dashboard View**                                               |                                        **Professional PDF Invoice**                                        |
+| :-----------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------: |
+| <img src="https://placehold.co/600x400/f8fafc/64748b?text=Dashboard+UI+Preview" alt="Dashboard" width="100%"> | <img src="https://placehold.co/600x400/ffffff/0f172a?text=Dynamic+PDF+Preview" alt="Invoice" width="100%"> |
 
-Auto-Calculations: Real-time balance and status updates (Unpaid, In Progress, Paid) based on recorded payments.
+---
 
-Company Branding: Invoices automatically pull your company's address, phone, and logo details from your settings.
+## ✨ Key Features
 
-🔒 Security & Auth
-Secure Authentication: Powered by NextAuth.js with JWT strategy.
+### 🏢 Enterprise-Grade Multi-Tenancy
 
-Password Protection: Industry-standard hashing via bcrypt.
+- **Strict Data Isolation:** Built-in security helpers ensure users only ever access data belonging to their specific `companyId`.
+- **Role Hierarchy:** Specialized access for **Owners** (Company management) and **Employees** (Daily operations).
+- **Secure Onboarding:** Unique 6-character **Invite Codes** for secure employee registration.
 
-Password Reset: Complete "Forgot Password" flow with secure email tokens.
+### 📋 Service Operations
 
-🛠️ Tech Stack
-Framework: Next.js 16.1 (App Router)
+- **Job Lifecycle:** Track projects from **Open** to **Closed** with a unified status system.
+- **Dynamic CRM:** Centralized customer database with contact details and full service history.
+- **Payment Engine:** Record full or partial payments across various methods (Cash, Card, etc.).
 
-Language: TypeScript
+### 📄 Professional Invoicing
 
-Database: PostgreSQL (via Prisma ORM)
+- **PDF Generation:** High-quality, branded invoices generated on-the-fly using `pdf-lib`.
+- **Smart Wrapping:** Intelligent text-handling for long job descriptions to prevent layout breakage.
+- **Auto-Balancing:** Automatic calculation of "Total Paid" and "Balance Due" based on payment history.
+- **Custom Branding:** Dynamic company header featuring your business address, phone, and email.
 
-Package Manager: pnpm
+### 🔒 Security & Auth
 
-Authentication: NextAuth.js
+- **NextAuth.js Integration:** Secure session management via JWT.
+- **Password Protection:** Industry-standard hashing using `bcrypt`.
+- **Account Recovery:** Full "Forgot Password" flow with secure, time-limited email tokens.
 
-Styling: Tailwind CSS
+---
 
-PDF Generation: pdf-lib
+## 🛠️ Tech Stack
 
-Icons: Lucide React
+| Component           | Technology                |
+| :------------------ | :------------------------ |
+| **Framework**       | Next.js 16.1 (App Router) |
+| **Runtime**         | Node.js 22.16.0           |
+| **Package Manager** | pnpm                      |
+| **Database**        | PostgreSQL                |
+| **ORM**             | Prisma                    |
+| **Auth**            | NextAuth.js               |
+| **Styling**         | Tailwind CSS              |
+| **PDF Engine**      | pdf-lib                   |
+| **Icons**           | Lucide React              |
 
-🚀 Getting Started
+---
 
-1. Prerequisites
-   Node.js: 22.16.0 or higher
+## 🚀 Getting Started
 
-   pnpm: npm install -g pnpm
+### 1. Prerequisites
 
-   PostgreSQL: A running instance (local or hosted)
+- **Node.js:** v22.16.0 or higher
+- **pnpm:** `npm install -g pnpm`
+- **PostgreSQL:** Local instance or hosted (e.g., Neon, Supabase)
 
-2. Installation
+### 2. Installation
 
-   # Clone the repository
+```bash
+# Clone the repository
+git clone [https://github.com/matheuspina-dev/tanager-invoicing.git](https://github.com/matheuspina-dev/tanager-invoicing.git)
 
-   git clone https://github.com/matheuspina-dev/tanager-invoicing.git
+# Navigate to project
+cd tanager-invoicing
 
-   # Install dependencies
+# Install dependencies
+pnpm install
+```
 
-   pnpm install
+### 3. Environment Configuration
 
-   # Set up environment variables
+```bash
+#Create a .env file in the root directory
+cp .env.example .env
+```
 
-   cp .env.example .env
+<details> <summary><b>Click to see required .env variables</b></summary>
+# Database Connection
+DATABASE_URL="postgresql://user:password@localhost:5432/tanager_db"
 
-3. Environment Variables
-   Configure your .env file:
+# NextAuth Configuration
 
-   DATABASE_URL="postgresql://user:password@localhost:5432/serviceflow"
-   NEXTAUTH_SECRET="your-random-secret-key"
-   NEXTAUTH_URL="http://localhost:3000"
-   NEXT_PUBLIC_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-generated-secret-key"
+NEXTAUTH_URL="http://localhost:3000"
+NEXT_PUBLIC_URL="http://localhost:3000"
 
-   # Email Settings (SMTP)
+# SMTP (Email) Settings
 
-   EMAIL_SERVER_HOST="smtp.example.com"
-   EMAIL_SERVER_PORT=587
-   EMAIL_SERVER_USER="user@example.com"
-   EMAIL_SERVER_PASSWORD="password"
-   EMAIL_FROM="user@example.com"
+EMAIL_SERVER_HOST="smtp.your-provider.com"
+EMAIL_SERVER_PORT=587
+EMAIL_SERVER_USER="your-email@example.com"
+EMAIL_SERVER_PASSWORD="your-smtp-password"
+EMAIL_FROM="billing@your-company.com"
 
-4. Database Setup
+</details>
 
-   # Sync schema and generate Prisma client
+### 4. Database Initialization
 
-   pnpm prisma db push
-   pnpm prisma generate
+```bash
+# Sync database schema
+pnpm prisma db push
 
-5. Run the App
-   pnpm dev
+# Generate Prisma client
+pnpm prisma generate
+```
 
-📐 Application Architecture
-The application is architected around a Multi-Tenant Server Actions pattern. Every query is scoped via a companyId retrieved from the secure JWT session.
+### 5. Launch
 
-Shared Database: All companies live in one database.
+```bash
+pnpm dev
+```
 
-Row-Level Filtering: Middleware and helper functions (requireCompanyId) ensure that where: { companyId } is applied to every single Prisma call.
-
-Server Components: Fetches data directly on the server for maximum performance and SEO.
-
-📝 License
-Distributed under the MIT License.
+<p>Open http://localhost:3000 to view the application.</p>
