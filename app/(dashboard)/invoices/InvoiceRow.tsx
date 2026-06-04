@@ -2,12 +2,31 @@
 
 import { useState } from "react";
 import { updateInvoice, deleteInvoice, emailInvoice } from "./actions";
+import InvoiceStatusBadge from "@/app/components/InvoiceStatusBadge";
+import { formatCurrency } from "@/lib/invoice-utils";
+import type { InvoiceWithRelations, InvoiceItem } from "@/lib/types";
 
-export function InvoiceRow({ invoice }: { invoice: any }) {
+interface InvoiceRowProps {
+  invoice: InvoiceWithRelations;
+}
+
+interface EditableItem {
+  description: string;
+  price: string;
+}
+
+function toEditableItems(items: InvoiceItem[]): EditableItem[] {
+  if (items.length === 0) return [{ description: "", price: "" }];
+  return items.map((item) => ({
+    description: item.description,
+    price: String(item.price),
+  }));
+}
+
+export function InvoiceRow({ invoice }: InvoiceRowProps) {
   const [editing, setEditing] = useState(false);
-
-  const [items, setItems] = useState(
-    invoice.items?.length ? invoice.items : [{ description: "", price: "" }],
+  const [items, setItems] = useState<EditableItem[]>(
+    toEditableItems(invoice.items),
   );
 
   const addNewItem = () => {
@@ -15,66 +34,58 @@ export function InvoiceRow({ invoice }: { invoice: any }) {
   };
 
   const removeItem = (index: number) => {
-    const newItems = items.filter((_: any, i: number) => i !== index);
-    setItems(newItems);
+    setItems(items.filter((_, i) => i !== index));
   };
 
-  const handleItemChange = (index: number, field: string, value: string) => {
-    const newItems = [...items];
-    newItems[index][field] = value;
-    setItems(newItems);
+  const handleItemChange = (
+    index: number,
+    field: keyof EditableItem,
+    value: string,
+  ) => {
+    const next = [...items];
+    next[index] = { ...next[index], [field]: value };
+    setItems(next);
   };
 
   return (
-    <li className="bg-white border rounded-lg p-4">
+    <li className="bg-white border border-gray-200 rounded-lg p-4">
       {!editing ? (
-        <div className="flex justify-between items-start">
-          <div>
-            <div className="flex items-center gap-2">
-              <p className="font-semibold text-black">
+        <div className="flex justify-between items-start gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="font-semibold text-gray-900 truncate">
                 {invoice.job.description}
               </p>
-              <span
-                className={`text-xs px-2 py-0.5 rounded ${
-                  invoice.status === "PAID"
-                    ? "bg-green-100 text-green-800"
-                    : invoice.status === "UNPAID"
-                      ? "bg-red-100 text-red-800"
-                      : "bg-yellow-100 text-yellow-800"
-                }`}
-              >
-                {invoice.status}
-              </span>
+              <InvoiceStatusBadge status={invoice.status} />
             </div>
-            <p className="font-bold text-lg mt-1">
-              ${(invoice.amount / 100).toFixed(2)}
+            <p className="font-bold text-lg mt-1 text-gray-900">
+              {formatCurrency(invoice.amount)}
             </p>
-
-            <p className="text-sm text-gray-700 mt-1">
-              Customer: {invoice.job.customer?.name || "Deleted customer"}
+            <p className="text-sm text-gray-600 mt-1">
+              {invoice.job.customer?.name ?? "Deleted customer"}
             </p>
-
-            <div className="mt-2 text-sm text-gray-500">
-              {invoice.items.map((item: any, i: number) => (
-                <div key={i}>
-                  • {item.description} (${(item.price / 100).toFixed(2)})
-                </div>
+            <ul className="mt-2 space-y-0.5 text-sm text-gray-500">
+              {invoice.items.map((item, i) => (
+                <li key={i}>
+                  &bull; {item.description} ({formatCurrency(item.price)})
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 shrink-0">
             <div className="flex gap-2">
               <a
                 href={`/invoices/${invoice.id}/pdf`}
                 target="_blank"
-                className="px-3 py-1 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 cursor-pointer text-center"
+                rel="noreferrer"
+                className="px-3 py-1 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 text-center"
               >
                 PDF
               </a>
               <button
                 onClick={() => setEditing(true)}
-                className="px-3 py-1 text-sm rounded bg-gray-200 text-gray-600 hover:bg-gray-300 cursor-pointer"
+                className="px-3 py-1 text-sm rounded bg-gray-100 text-gray-700 hover:bg-gray-200"
               >
                 Edit
               </button>
@@ -83,14 +94,13 @@ export function InvoiceRow({ invoice }: { invoice: any }) {
             <form
               action={async () => {
                 await emailInvoice(invoice.id);
-                alert("Invoice sent!");
               }}
             >
               <button
                 type="submit"
                 className="text-sm text-blue-600 hover:underline w-full text-left"
               >
-                Send Email
+                Send email
               </button>
             </form>
 
@@ -119,21 +129,23 @@ export function InvoiceRow({ invoice }: { invoice: any }) {
           <input type="hidden" name="id" value={invoice.id} />
 
           <div className="flex justify-between items-center bg-gray-50 p-2 rounded">
-            <span className="font-semibold text-gray-700">Edit Invoice</span>
+            <span className="font-semibold text-gray-700 text-sm">
+              Edit invoice
+            </span>
             <select
               name="status"
               defaultValue={invoice.status}
               className="border bg-white text-gray-600 rounded px-2 py-1 text-sm"
             >
-              <option value="UNPAID">UNPAID</option>
-              <option value="IN_PROGRESS">IN PROGRESS</option>
-              <option value="PAID">PAID</option>
+              <option value="UNPAID">Unpaid</option>
+              <option value="IN_PROGRESS">In progress</option>
+              <option value="PAID">Paid</option>
             </select>
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-600">Items</label>
-            {items.map((item: any, index: number) => (
+            {items.map((item, index) => (
               <div key={index} className="flex gap-2 items-start">
                 <input
                   name={`items[${index}][description]`}
@@ -159,9 +171,10 @@ export function InvoiceRow({ invoice }: { invoice: any }) {
                 <button
                   type="button"
                   onClick={() => removeItem(index)}
+                  aria-label="Remove item"
                   className="text-red-500 hover:text-red-700 px-2"
                 >
-                  ✕
+                  &times;
                 </button>
               </div>
             ))}
@@ -170,7 +183,7 @@ export function InvoiceRow({ invoice }: { invoice: any }) {
               onClick={addNewItem}
               className="text-sm text-blue-600 hover:underline"
             >
-              + Add Item
+              + Add item
             </button>
           </div>
 
@@ -179,9 +192,9 @@ export function InvoiceRow({ invoice }: { invoice: any }) {
               type="button"
               onClick={() => {
                 setEditing(false);
-                setItems(invoice.items);
+                setItems(toEditableItems(invoice.items));
               }}
-              className="bg-gray-200 px-4 py-2 text-gray-600 rounded hover:bg-gray-300 text-sm"
+              className="bg-gray-100 px-4 py-2 text-gray-600 rounded hover:bg-gray-200 text-sm"
             >
               Cancel
             </button>
@@ -189,7 +202,7 @@ export function InvoiceRow({ invoice }: { invoice: any }) {
               type="submit"
               className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm"
             >
-              Save Changes
+              Save changes
             </button>
           </div>
         </form>
