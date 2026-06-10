@@ -1,0 +1,14 @@
+{
+  "buildCommand": "pnpm build",
+  "installCommand": "pnpm install",
+  "framework": "nextjs",
+  "rewrites": [
+    {
+      "source": "/demo",
+      "destination": "/demo"
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_DEMO_MODE": "true"
+  }
+}
