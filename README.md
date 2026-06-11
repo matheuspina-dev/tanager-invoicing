@@ -1,148 +1,130 @@
-<div align="center">
-  <img src="https://placehold.co/120x120/2563eb/white?text=TI" alt="Tanager Invoicing Logo" width="120" height="120" style="border-radius: 20px" />
+# Tanager Invoicing
 
-# Tanager Invoicing 🚀
+Invoice and job management for small service businesses. Built with Next.js 16 App Router, TypeScript, Prisma, and Tailwind CSS.
 
-**Professional Multi-Tenant Service & Invoicing Management Platform**
-
-  <p>
-    An all-in-one solution for service businesses to manage jobs, track customers, <br/> 
-    and generate professional PDF invoices with automated payment tracking.
-  </p>
-
-  <p>
-    <img src="https://img.shields.io/badge/Next.js-16.1-black?style=flat-square&logo=next.js" />
-    <img src="https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript" />
-    <img src="https://img.shields.io/badge/PostgreSQL-15+-336791?style=flat-square&logo=postgresql" />
-    <img src="https://img.shields.io/badge/Prisma-ORM-2d3748?style=flat-square&logo=prisma" />
-    <img src="https://img.shields.io/badge/Node.js-22.16.0-339933?style=flat-square&logo=nodedotjs" />
-    <img src="https://img.shields.io/badge/pnpm-9.x-F69220?style=flat-square&logo=pnpm" />
-  </p>
-
-<a href="#-key-features">Key Features</a> •
-<a href="#-getting-started">Getting Started</a> •
-<a href="#-architecture">Architecture</a> •
-<a href="#-license">License</a>
-
-</div>
-
-<br />
-
-## 📸 Overview
-
-|                                              **Dashboard View**                                               |                                        **Professional PDF Invoice**                                        |
-| :-----------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------: |
-| <img src="https://placehold.co/600x400/f8fafc/64748b?text=Dashboard+UI+Preview" alt="Dashboard" width="100%"> | <img src="https://placehold.co/600x400/ffffff/0f172a?text=Dynamic+PDF+Preview" alt="Invoice" width="100%"> |
+Live demo: [tanager-invoicing.vercel.app](https://tanager-invoicing.vercel.app) — visit `/demo` for a read-only view without signing in.
 
 ---
 
-## ✨ Key Features
+## Stack
 
-### 🏢 Enterprise-Grade Multi-Tenancy
-
-- **Strict Data Isolation:** Built-in security helpers ensure users only ever access data belonging to their specific `companyId`.
-- **Role Hierarchy:** Specialized access for **Owners** (Company management) and **Employees** (Daily operations).
-- **Secure Onboarding:** Unique 6-character **Invite Codes** for secure employee registration.
-
-### 📋 Service Operations
-
-- **Job Lifecycle:** Track projects from **Open** to **Closed** with a unified status system.
-- **Dynamic CRM:** Centralized customer database with contact details and full service history.
-- **Payment Engine:** Record full or partial payments across various methods (Cash, Card, etc.).
-
-### 📄 Professional Invoicing
-
-- **PDF Generation:** High-quality, branded invoices generated on-the-fly using `pdf-lib`.
-- **Smart Wrapping:** Intelligent text-handling for long job descriptions to prevent layout breakage.
-- **Auto-Balancing:** Automatic calculation of "Total Paid" and "Balance Due" based on payment history.
-- **Custom Branding:** Dynamic company header featuring your business address, phone, and email.
-
-### 🔒 Security & Auth
-
-- **NextAuth.js Integration:** Secure session management via JWT.
-- **Password Protection:** Industry-standard hashing using `bcrypt`.
-- **Account Recovery:** Full "Forgot Password" flow with secure, time-limited email tokens.
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16.1 (App Router) |
+| Language | TypeScript 5 |
+| Database | PostgreSQL via Prisma ORM |
+| Auth | NextAuth.js (credentials + JWT) |
+| Styling | Tailwind CSS v4 |
+| PDF | pdf-lib |
+| Tests | Vitest + React Testing Library |
+| Deploy | Vercel |
 
 ---
 
-## 🛠️ Tech Stack
+## Features
 
-| Component           | Technology                |
-| :------------------ | :------------------------ |
-| **Framework**       | Next.js 16.1 (App Router) |
-| **Runtime**         | Node.js 22.16.0           |
-| **Package Manager** | pnpm                      |
-| **Database**        | PostgreSQL                |
-| **ORM**             | Prisma                    |
-| **Auth**            | NextAuth.js               |
-| **Styling**         | Tailwind CSS              |
-| **PDF Engine**      | pdf-lib                   |
-| **Icons**           | Lucide React              |
+- Multi-tenant: each company sees only its own data
+- Job lifecycle tracking (Open / Closed)
+- Customer CRM with contact history
+- Invoice creation with line items and status tracking (Unpaid / In Progress / Paid)
+- Payment recording with running balance
+- PDF invoice generation and email delivery
+- Demo mode at `/demo` — static fixture data, no login required
 
 ---
 
-## 🚀 Getting Started
+## Run locally
 
-### 1. Prerequisites
-
-- **Node.js:** v22.16.0 or higher
-- **pnpm:** `npm install -g pnpm`
-- **PostgreSQL:** Local instance or hosted (e.g., Neon, Supabase)
-
-### 2. Installation
+**Prerequisites:** Node.js 22+, pnpm, PostgreSQL
 
 ```bash
-# Clone the repository
-git clone [https://github.com/matheuspina-dev/tanager-invoicing.git](https://github.com/matheuspina-dev/tanager-invoicing.git)
-
-# Navigate to project
+git clone https://github.com/matheuspina-dev/tanager-invoicing.git
 cd tanager-invoicing
-
-# Install dependencies
 pnpm install
 ```
 
-### 3. Environment Configuration
+Copy the environment template and fill in your values:
 
 ```bash
-#Create a .env file in the root directory
 cp .env.example .env
 ```
 
-<details> <summary><b>Click to see required .env variables</b></summary>
-# Database Connection
-DATABASE_URL="postgresql://user:password@localhost:5432/tanager_db"
+Required variables:
 
-# NextAuth Configuration
+```
+DATABASE_URL=postgresql://user:password@localhost:5432/tanager_db
+NEXTAUTH_SECRET=your-secret-here
+NEXTAUTH_URL=http://localhost:3000
+NEXT_PUBLIC_URL=http://localhost:3000
 
-NEXTAUTH_SECRET="your-generated-secret-key"
-NEXTAUTH_URL="http://localhost:3000"
-NEXT_PUBLIC_URL="http://localhost:3000"
-
-# SMTP (Email) Settings
-
-EMAIL_SERVER_HOST="smtp.your-provider.com"
+# Optional — email delivery
+EMAIL_SERVER_HOST=
 EMAIL_SERVER_PORT=587
-EMAIL_SERVER_USER="your-email@example.com"
-EMAIL_SERVER_PASSWORD="your-smtp-password"
-EMAIL_FROM="billing@your-company.com"
+EMAIL_SERVER_USER=
+EMAIL_SERVER_PASSWORD=
+EMAIL_FROM=
+```
 
-</details>
-
-### 4. Database Initialization
+Push the schema and generate the Prisma client:
 
 ```bash
-# Sync database schema
 pnpm prisma db push
-
-# Generate Prisma client
 pnpm prisma generate
 ```
 
-### 5. Launch
+Seed demo data (optional):
+
+```bash
+pnpm db:seed
+```
+
+Start the dev server:
 
 ```bash
 pnpm dev
 ```
 
-<p>Open http://localhost:3000 to view the application.</p>
+Open [http://localhost:3000](http://localhost:3000).
+
+---
+
+## Tests
+
+```bash
+pnpm test
+```
+
+Runs Vitest in CI mode. Tests cover:
+
+- `lib/invoice-utils` — calculateTotal, formatCurrency, getStatusColor, getStatusLabel, calculateBalanceDue
+- `InvoiceStatusBadge` — color class and label per status
+- `StatusTabs` — tab rendering, active state, router integration
+- `SearchInput` — controlled input, router integration
+- `lib/demo/seed` — fixture shape and data integrity
+- `InvoiceRow` — render, edit toggle, cancel reset
+
+---
+
+## Project structure
+
+```
+app/
+  (auth)/         login, register, password reset
+  (dashboard)/    protected routes: invoices, jobs, customers, payments, settings
+  components/     shared UI: Sidebar, TopBar, InvoiceTable, InvoiceStatusBadge, EmptyState
+  demo/           read-only demo page (no auth required)
+lib/
+  types.ts        shared domain interfaces
+  invoice-utils.ts  pure calculation and formatting helpers
+  demo/           seeded fixture data
+prisma/
+  schema.prisma   database schema
+  seed.ts         development seed script
+__tests__/        all test files
+```
+
+---
+
+## License
+
+MIT
