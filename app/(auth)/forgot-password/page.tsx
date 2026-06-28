@@ -7,15 +7,20 @@ import Link from "next/link";
 export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [isError, setIsError] = useState(false);
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
     setMessage(null);
+    setIsError(false);
     try {
       await requestPasswordReset(formData);
       setMessage("If an account exists, a reset link has been sent.");
-    } catch (err) {
-      setMessage("Something went wrong. Please try again.");
+    } catch (err: unknown) {
+      setIsError(true);
+      setMessage(
+        err instanceof Error ? err.message : "Something went wrong. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
@@ -32,11 +37,19 @@ export default function ForgotPasswordPage() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {message ? (
-            <div className="bg-green-50 border border-green-200 text-green-700 p-4 rounded text-center">
+            <div
+              className={`p-4 rounded text-center border ${
+                isError
+                  ? "bg-red-50 border-red-200 text-red-700"
+                  : "bg-green-50 border-green-200 text-green-700"
+              }`}
+            >
               <p>{message}</p>
               <Link
                 href="/login"
-                className="block mt-4 text-sm font-medium text-green-800 hover:underline"
+                className={`block mt-4 text-sm font-medium hover:underline ${
+                  isError ? "text-red-800" : "text-green-800"
+                }`}
               >
                 Return to Login
               </Link>

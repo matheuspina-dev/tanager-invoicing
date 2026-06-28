@@ -6,6 +6,7 @@ import { getJobStatusColor } from "@/lib/invoice-utils";
 
 export function JobRow({ job }: { job: any }) {
   const [editing, setEditing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   return (
     <li className="bg-white border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
@@ -38,7 +39,20 @@ export function JobRow({ job }: { job: any }) {
               Edit
             </button>
 
-            <form action={deleteJob}>
+            <form
+              action={async (formData) => {
+                setError(null);
+                try {
+                  await deleteJob(formData);
+                } catch (err: unknown) {
+                  setError(
+                    err instanceof Error
+                      ? err.message
+                      : "Failed to delete job",
+                  );
+                }
+              }}
+            >
               <input type="hidden" name="id" value={job.id} />
               <button
                 type="submit"
@@ -51,12 +65,22 @@ export function JobRow({ job }: { job: any }) {
               </button>
             </form>
           </div>
+
         </div>
       ) : (
         <form
           action={async (formData: FormData) => {
-            await updateJob(formData);
-            setEditing(false);
+            setError(null);
+            try {
+              await updateJob(formData);
+              setEditing(false);
+            } catch (err: unknown) {
+              setError(
+                err instanceof Error
+                  ? err.message
+                  : "Failed to update job",
+              );
+            }
           }}
           className="space-y-4"
         >
@@ -111,6 +135,9 @@ export function JobRow({ job }: { job: any }) {
             </div>
           </div>
         </form>
+      )}
+      {error && (
+        <p className="text-sm text-red-600 mt-2">{error}</p>
       )}
     </li>
   );

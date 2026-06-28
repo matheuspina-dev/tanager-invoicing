@@ -11,7 +11,7 @@ async function recalcInvoiceStatus(invoiceId: string) {
     where: { id: invoiceId },
     include: { payments: true },
   });
-  if (!invoice) return;
+  if (!invoice) throw new Error("Invoice not found");
 
   const totalPaid = invoice.payments.reduce((sum, p) => sum + p.amount, 0);
   const status =

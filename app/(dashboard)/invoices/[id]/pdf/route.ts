@@ -36,7 +36,12 @@ export async function GET(
     return new NextResponse("Invoice not found", { status: 404 });
   }
 
-  const pdfBuffer = await generateInvoicePdf(invoice);
+  let pdfBuffer: Buffer;
+  try {
+    pdfBuffer = await generateInvoicePdf(invoice);
+  } catch {
+    return new NextResponse("Failed to generate PDF", { status: 500 });
+  }
 
   return new NextResponse(pdfBuffer, {
     headers: {
