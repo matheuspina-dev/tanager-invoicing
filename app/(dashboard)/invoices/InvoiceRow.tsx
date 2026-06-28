@@ -139,9 +139,6 @@ export function InvoiceRow({ invoice }: InvoiceRowProps) {
             </form>
           </div>
 
-          {error && (
-            <p className="text-sm text-red-600 mt-2">{error}</p>
-          )}
         </div>
       ) : (
         <form
@@ -240,6 +237,9 @@ export function InvoiceRow({ invoice }: InvoiceRowProps) {
             </button>
           </div>
         </form>
+      )}
+      {error && (
+        <p className="text-sm text-red-600 mt-2">{error}</p>
       )}
     </li>
   );

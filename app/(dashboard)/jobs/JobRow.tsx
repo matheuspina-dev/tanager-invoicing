@@ -73,9 +73,6 @@ export function JobRow({ job }: { job: any }) {
             </form>
           </div>
 
-          {error && (
-            <p className="text-sm text-red-600 mt-2">{error}</p>
-          )}
         </div>
       ) : (
         <form
@@ -145,6 +142,9 @@ export function JobRow({ job }: { job: any }) {
             </div>
           </div>
         </form>
+      )}
+      {error && (
+        <p className="text-sm text-red-600 mt-2">{error}</p>
       )}
     </li>
   );

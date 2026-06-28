@@ -78,9 +78,6 @@ export function CustomerRow({ customer }: { customer: any }) {
             </form>
           </div>
 
-          {error && (
-            <p className="text-sm text-red-600 mt-2">{error}</p>
-          )}
         </div>
       ) : (
         <form action={handleSave} className="space-y-4">
@@ -135,6 +132,9 @@ export function CustomerRow({ customer }: { customer: any }) {
             </div>
           </div>
         </form>
+      )}
+      {error && (
+        <p className="text-sm text-red-600 mt-2">{error}</p>
       )}
     </li>
   );
