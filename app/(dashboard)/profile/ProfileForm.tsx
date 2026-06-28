@@ -6,6 +6,7 @@ import { updateProfile } from "./actions";
 export function ProfileForm({ user }: { user: any }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
@@ -13,8 +14,12 @@ export function ProfileForm({ user }: { user: any }) {
     try {
       const res = await updateProfile(formData);
       setMessage(res.message);
-    } catch (err: any) {
-      setMessage("Error updating profile");
+      setIsError(false);
+    } catch (err: unknown) {
+      setMessage(
+        err instanceof Error ? err.message : "Error updating profile",
+      );
+      setIsError(true);
     } finally {
       setLoading(false);
     }
@@ -23,7 +28,13 @@ export function ProfileForm({ user }: { user: any }) {
   return (
     <form action={handleSubmit} className="space-y-5">
       {message && (
-        <div className="bg-green-50 text-green-700 p-3 rounded text-sm">
+        <div
+          className={`p-3 rounded text-sm ${
+            isError
+              ? "bg-red-50 text-red-700 border border-red-100"
+              : "bg-green-50 text-green-700"
+          }`}
+        >
           {message}
         </div>
       )}

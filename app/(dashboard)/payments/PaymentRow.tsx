@@ -5,6 +5,7 @@ import { updatePayment, deletePayment } from "./actions";
 
 export function PaymentRow({ payment }: { payment: any }) {
   const [editing, setEditing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const methodColors: Record<string, string> = {
     CASH: "bg-green-100 text-green-800",
@@ -48,7 +49,20 @@ export function PaymentRow({ payment }: { payment: any }) {
               Edit
             </button>
 
-            <form action={deletePayment}>
+            <form
+              action={async (formData) => {
+                setError(null);
+                try {
+                  await deletePayment(formData);
+                } catch (err: unknown) {
+                  setError(
+                    err instanceof Error
+                      ? err.message
+                      : "Failed to delete payment",
+                  );
+                }
+              }}
+            >
               <input type="hidden" name="id" value={payment.id} />
               <button
                 type="submit"
@@ -61,12 +75,25 @@ export function PaymentRow({ payment }: { payment: any }) {
               </button>
             </form>
           </div>
+
+          {error && (
+            <p className="text-sm text-red-600 mt-2">{error}</p>
+          )}
         </div>
       ) : (
         <form
           action={async (formData: FormData) => {
-            await updatePayment(formData);
-            setEditing(false);
+            setError(null);
+            try {
+              await updatePayment(formData);
+              setEditing(false);
+            } catch (err: unknown) {
+              setError(
+                err instanceof Error
+                  ? err.message
+                  : "Failed to update payment",
+              );
+            }
           }}
           className="space-y-4"
         >

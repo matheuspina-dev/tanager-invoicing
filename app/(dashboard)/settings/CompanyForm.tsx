@@ -6,6 +6,7 @@ import { updateCompany } from "./actions";
 export function CompanyForm({ company }: { company: any }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
@@ -13,8 +14,12 @@ export function CompanyForm({ company }: { company: any }) {
     try {
       const res = await updateCompany(formData);
       setMessage(res.message);
-    } catch (err: any) {
-      setMessage("Error updating settings");
+      setIsError(false);
+    } catch (err: unknown) {
+      setMessage(
+        err instanceof Error ? err.message : "Error updating settings",
+      );
+      setIsError(true);
     } finally {
       setLoading(false);
     }
@@ -23,7 +28,13 @@ export function CompanyForm({ company }: { company: any }) {
   return (
     <form action={handleSubmit} className="space-y-4">
       {message && (
-        <div className="bg-green-50 text-green-700 p-3 rounded text-sm border border-green-100">
+        <div
+          className={`p-3 rounded text-sm border ${
+            isError
+              ? "bg-red-50 text-red-700 border-red-100"
+              : "bg-green-50 text-green-700 border-green-100"
+          }`}
+        >
           {message}
         </div>
       )}

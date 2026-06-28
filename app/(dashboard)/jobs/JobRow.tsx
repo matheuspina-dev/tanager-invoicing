@@ -5,6 +5,7 @@ import { updateJob, deleteJob } from "./actions";
 
 export function JobRow({ job }: { job: any }) {
   const [editing, setEditing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const statusColors: Record<string, string> = {
     OPEN: "bg-blue-100 text-blue-800",
@@ -45,7 +46,20 @@ export function JobRow({ job }: { job: any }) {
               Edit
             </button>
 
-            <form action={deleteJob}>
+            <form
+              action={async (formData) => {
+                setError(null);
+                try {
+                  await deleteJob(formData);
+                } catch (err: unknown) {
+                  setError(
+                    err instanceof Error
+                      ? err.message
+                      : "Failed to delete job",
+                  );
+                }
+              }}
+            >
               <input type="hidden" name="id" value={job.id} />
               <button
                 type="submit"
@@ -58,12 +72,25 @@ export function JobRow({ job }: { job: any }) {
               </button>
             </form>
           </div>
+
+          {error && (
+            <p className="text-sm text-red-600 mt-2">{error}</p>
+          )}
         </div>
       ) : (
         <form
           action={async (formData: FormData) => {
-            await updateJob(formData);
-            setEditing(false);
+            setError(null);
+            try {
+              await updateJob(formData);
+              setEditing(false);
+            } catch (err: unknown) {
+              setError(
+                err instanceof Error
+                  ? err.message
+                  : "Failed to update job",
+              );
+            }
           }}
           className="space-y-4"
         >

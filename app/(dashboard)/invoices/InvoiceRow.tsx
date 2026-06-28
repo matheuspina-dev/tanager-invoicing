@@ -25,6 +25,7 @@ function toEditableItems(items: InvoiceItem[]): EditableItem[] {
 
 export function InvoiceRow({ invoice }: InvoiceRowProps) {
   const [editing, setEditing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [items, setItems] = useState<EditableItem[]>(
     toEditableItems(invoice.items),
   );
@@ -93,7 +94,14 @@ export function InvoiceRow({ invoice }: InvoiceRowProps) {
 
             <form
               action={async () => {
-                await emailInvoice(invoice.id);
+                setError(null);
+                try {
+                  await emailInvoice(invoice.id);
+                } catch (err: unknown) {
+                  setError(
+                    err instanceof Error ? err.message : "Failed to send email",
+                  );
+                }
               }}
             >
               <button
@@ -104,7 +112,20 @@ export function InvoiceRow({ invoice }: InvoiceRowProps) {
               </button>
             </form>
 
-            <form action={deleteInvoice}>
+            <form
+              action={async (formData) => {
+                setError(null);
+                try {
+                  await deleteInvoice(formData);
+                } catch (err: unknown) {
+                  setError(
+                    err instanceof Error
+                      ? err.message
+                      : "Failed to delete invoice",
+                  );
+                }
+              }}
+            >
               <input type="hidden" name="id" value={invoice.id} />
               <button
                 type="submit"
@@ -117,12 +138,25 @@ export function InvoiceRow({ invoice }: InvoiceRowProps) {
               </button>
             </form>
           </div>
+
+          {error && (
+            <p className="text-sm text-red-600 mt-2">{error}</p>
+          )}
         </div>
       ) : (
         <form
           action={async (formData: FormData) => {
-            await updateInvoice(formData);
-            setEditing(false);
+            setError(null);
+            try {
+              await updateInvoice(formData);
+              setEditing(false);
+            } catch (err: unknown) {
+              setError(
+                err instanceof Error
+                  ? err.message
+                  : "Failed to update invoice",
+              );
+            }
           }}
           className="space-y-4"
         >

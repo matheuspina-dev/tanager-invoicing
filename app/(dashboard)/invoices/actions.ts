@@ -73,9 +73,14 @@ export async function updateInvoice(formData: FormData) {
     if (!description || !priceRaw) break;
 
     const price = parseInt(priceRaw, 10);
-    if (!isNaN(price) && price > 0) {
-      items.push({ description, price });
+    if (isNaN(price) || price <= 0) {
+      throw new Error("Invalid item price");
     }
+    items.push({ description, price });
+  }
+
+  if (items.length === 0) {
+    throw new Error("At least one invoice item is required");
   }
 
   const newAmount = items.reduce((sum, item) => sum + item.price, 0);

@@ -5,10 +5,18 @@ import { updateCustomer, deleteCustomer } from "./actions";
 
 export function CustomerRow({ customer }: { customer: any }) {
   const [editing, setEditing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSave = async (formData: FormData) => {
-    await updateCustomer(formData);
-    setEditing(false);
+    setError(null);
+    try {
+      await updateCustomer(formData);
+      setEditing(false);
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : "Failed to update customer",
+      );
+    }
   };
   return (
     <li className="bg-white border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
@@ -43,10 +51,15 @@ export function CustomerRow({ customer }: { customer: any }) {
 
             <form
               action={async (formData) => {
+                setError(null);
                 try {
                   await deleteCustomer(formData);
-                } catch (err: any) {
-                  alert(err.message);
+                } catch (err: unknown) {
+                  setError(
+                    err instanceof Error
+                      ? err.message
+                      : "Failed to delete customer",
+                  );
                 }
               }}
             >
@@ -64,6 +77,10 @@ export function CustomerRow({ customer }: { customer: any }) {
               </button>
             </form>
           </div>
+
+          {error && (
+            <p className="text-sm text-red-600 mt-2">{error}</p>
+          )}
         </div>
       ) : (
         <form action={handleSave} className="space-y-4">
