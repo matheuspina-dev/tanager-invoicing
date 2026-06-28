@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { generateInvoicePdf } from "./pdf";
 import { sendEmail } from "@/lib/email";
+import { validateInvoiceStatus } from "@/lib/validation";
 
 async function getUserCompanyId() {
   const session = await getServerSession(authOptions);
@@ -16,7 +17,8 @@ async function getUserCompanyId() {
 export async function createInvoice(formData: FormData) {
   const companyId = await getUserCompanyId();
   const jobId = formData.get("jobId")?.toString();
-  const status = formData.get("status")?.toString() || "UNPAID";
+  const statusRaw = formData.get("status")?.toString() || "UNPAID";
+  const status = validateInvoiceStatus(statusRaw);
 
   if (!jobId) throw new Error("Job required");
 
@@ -60,7 +62,8 @@ export async function updateInvoice(formData: FormData) {
   const invoice = await prisma.invoice.findFirst({ where: { id, companyId } });
   if (!invoice) throw new Error("Invoice not found");
 
-  const status = formData.get("status")?.toString() || invoice.status;
+  const statusRaw = formData.get("status")?.toString() || invoice.status;
+  const status = validateInvoiceStatus(statusRaw);
 
   const items: { description: string; price: number }[] = [];
   for (let i = 0; ; i++) {

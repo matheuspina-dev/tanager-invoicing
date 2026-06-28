@@ -1,7 +1,6 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { connect } from "http2";
 
 declare global {
   var prisma: PrismaClient | undefined;
@@ -15,7 +14,7 @@ export const prisma =
   global.prisma ||
   new PrismaClient({
     adapter,
-    log: ["query"],
+    log: process.env.NODE_ENV === "development" ? ["query"] : [],
   });
 
 if (process.env.NODE_ENV !== "production") global.prisma = prisma;

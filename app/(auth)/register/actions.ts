@@ -2,21 +2,26 @@
 
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
+import { validatePassword, validateEmail } from "@/lib/validation";
 
 export async function registerCompanyOwner(formData: FormData) {
   const name = formData.get("name")?.toString();
   const companyName = formData.get("company")?.toString();
-  const email = formData.get("email")?.toString();
-  const password = formData.get("password")?.toString();
+  const emailRaw = formData.get("email")?.toString();
+  const passwordRaw = formData.get("password")?.toString();
 
-  if (!name || !companyName || !email || !password) {
+  if (!name || !companyName || !emailRaw || !passwordRaw) {
     throw new Error("All fields are required");
   }
+
+  const email = validateEmail(emailRaw);
+  const password = validatePassword(passwordRaw);
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) throw new Error("Email already registered");
 
-  const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+  const code = crypto.randomBytes(4).toString("hex").toUpperCase();
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -44,17 +49,20 @@ export async function registerCompanyOwner(formData: FormData) {
 
 export async function registerEmployee(formData: FormData) {
   const name = formData.get("name")?.toString();
-  const email = formData.get("email")?.toString();
-  const password = formData.get("password")?.toString();
+  const emailRaw = formData.get("email")?.toString();
+  const passwordRaw = formData.get("password")?.toString();
   const companyCode = formData
     .get("companyCode")
     ?.toString()
     .trim()
     .toUpperCase();
 
-  if (!name || !email || !password || !companyCode) {
+  if (!name || !emailRaw || !passwordRaw || !companyCode) {
     throw new Error("All fields are required");
   }
+
+  const email = validateEmail(emailRaw);
+  const password = validatePassword(passwordRaw);
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) throw new Error("Email already registered");

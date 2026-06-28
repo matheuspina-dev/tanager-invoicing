@@ -1,13 +1,26 @@
 import { ClientSecretCredential } from "@azure/identity";
 
-const credential = new ClientSecretCredential(
-  process.env.TENANT_ID!,
-  process.env.CLIENT_ID!,
-  process.env.CLIENT_SECRET!
-);
+let credential: ClientSecretCredential | null = null;
+
+function getCredential(): ClientSecretCredential {
+  if (!credential) {
+    const tenantId = process.env.TENANT_ID;
+    const clientId = process.env.CLIENT_ID;
+    const clientSecret = process.env.CLIENT_SECRET;
+
+    if (!tenantId || !clientId || !clientSecret) {
+      throw new Error(
+        "Email is not configured: missing TENANT_ID, CLIENT_ID, or CLIENT_SECRET"
+      );
+    }
+
+    credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+  }
+  return credential;
+}
 
 async function getAccessToken() {
-  const token = await credential.getToken(
+  const token = await getCredential().getToken(
     "https://graph.microsoft.com/.default"
   );
   if (!token?.token) throw new Error("Failed to get access token");
@@ -20,6 +33,15 @@ export async function sendEmail(options: {
   text: string;
   attachments?: { filename: string; content: Buffer }[];
 }) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(options.to)) {
+    throw new Error("Invalid recipient email address");
+  }
+
+  if (!process.env.SMTP_USER) {
+    throw new Error("Email is not configured: missing SMTP_USER");
+  }
+
   const accessToken = await getAccessToken();
 
   const attachments =
