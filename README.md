@@ -1,41 +1,58 @@
+<div align="center">
+
 # Tanager Invoicing
 
-Invoice and job management for small service businesses. Built with Next.js 16 App Router, TypeScript, Prisma, and Tailwind CSS.
+**Invoicing and job management platform for small service businesses.**
 
-Live demo: [tanager-invoicing.vercel.app](https://tanager-invoicing.vercel.app) — visit `/demo` for a read-only view without signing in.
+Built with Next.js 16 &middot; TypeScript &middot; PostgreSQL &middot; Prisma &middot; Tailwind CSS
 
----
+[Live Demo](https://tanager-invoicing.vercel.app) &nbsp;&bull;&nbsp; [Try the Demo](https://tanager-invoicing.vercel.app/demo)
 
-## Stack
-
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 16.1 (App Router) |
-| Language | TypeScript 5 |
-| Database | PostgreSQL via Prisma ORM |
-| Auth | NextAuth.js (credentials + JWT) |
-| Styling | Tailwind CSS v4 |
-| PDF | pdf-lib |
-| Tests | Vitest + React Testing Library |
-| Deploy | Vercel |
+</div>
 
 ---
+
+## Overview
+
+Tanager Invoicing is a multi-tenant web application that helps small service businesses manage their customers, jobs, invoices, and payments in one place. Each company's data is fully isolated, and the platform supports the complete job lifecycle from creation through invoicing and payment collection.
+
+A public **demo mode** is available at `/demo` with read-only sample data — no account required.
 
 ## Features
 
-- Multi-tenant: each company sees only its own data
-- Job lifecycle tracking (Open / Closed)
-- Customer CRM with contact history
-- Invoice creation with line items and status tracking (Unpaid / In Progress / Paid)
-- Payment recording with running balance
-- PDF invoice generation and email delivery
-- Demo mode at `/demo` — static fixture data, no login required
+- **Multi-tenant architecture** — complete data isolation per company
+- **Customer management** — contacts, email, phone, and job history
+- **Job tracking** — create and manage jobs with Open / Closed status
+- **Invoicing** — line-item invoices with Unpaid / In Progress / Paid workflow
+- **Payments** — record payments against invoices with running balance calculation
+- **PDF generation** — create and download professional invoice PDFs via pdf-lib
+- **Email delivery** — send invoices directly to customers through Nodemailer
+- **Authentication** — credentials-based auth with JWT sessions via NextAuth.js
+- **Demo mode** — static fixture data at `/demo`, no login required
 
----
+## Tech Stack
 
-## Run locally
+| Layer | Technology |
+| --- | --- |
+| Framework | [Next.js 16](https://nextjs.org/) (App Router) |
+| Language | [TypeScript 5](https://www.typescriptlang.org/) |
+| Database | [PostgreSQL](https://www.postgresql.org/) via [Prisma ORM](https://www.prisma.io/) |
+| Authentication | [NextAuth.js](https://next-auth.js.org/) (credentials + JWT) |
+| Styling | [Tailwind CSS v4](https://tailwindcss.com/) |
+| PDF Generation | [pdf-lib](https://pdf-lib.js.org/) |
+| Email | [Nodemailer](https://nodemailer.com/) |
+| Testing | [Vitest](https://vitest.dev/) + [React Testing Library](https://testing-library.com/) |
+| Deployment | [Vercel](https://vercel.com/) |
 
-**Prerequisites:** Node.js 22+, pnpm, PostgreSQL
+## Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) 22 or later
+- [pnpm](https://pnpm.io/)
+- [PostgreSQL](https://www.postgresql.org/)
+
+### Installation
 
 ```bash
 git clone https://github.com/matheuspina-dev/tanager-invoicing.git
@@ -43,88 +60,118 @@ cd tanager-invoicing
 pnpm install
 ```
 
-Copy the environment template and fill in your values:
+### Environment Variables
+
+Copy the example environment file and fill in your values:
 
 ```bash
 cp .env.example .env
 ```
 
-Required variables:
+| Variable | Required | Description |
+| --- | :---: | --- |
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `NEXTAUTH_SECRET` | Yes | Random secret for JWT signing |
+| `NEXTAUTH_URL` | Yes | Application URL (e.g. `http://localhost:3000`) |
+| `NEXT_PUBLIC_URL` | Yes | Public-facing URL |
+| `EMAIL_SERVER_HOST` | No | SMTP host for invoice email delivery |
+| `EMAIL_SERVER_PORT` | No | SMTP port (default `587`) |
+| `EMAIL_SERVER_USER` | No | SMTP username |
+| `EMAIL_SERVER_PASSWORD` | No | SMTP password |
+| `EMAIL_FROM` | No | Sender email address |
 
-```
-DATABASE_URL=postgresql://user:password@localhost:5432/tanager_db
-NEXTAUTH_SECRET=your-secret-here
-NEXTAUTH_URL=http://localhost:3000
-NEXT_PUBLIC_URL=http://localhost:3000
+### Database Setup
 
-# Optional — email delivery
-EMAIL_SERVER_HOST=
-EMAIL_SERVER_PORT=587
-EMAIL_SERVER_USER=
-EMAIL_SERVER_PASSWORD=
-EMAIL_FROM=
-```
-
-Push the schema and generate the Prisma client:
+Push the Prisma schema to your database and generate the client:
 
 ```bash
 pnpm prisma db push
 pnpm prisma generate
 ```
 
-Seed demo data (optional):
+Optionally seed the database with sample data:
 
 ```bash
 pnpm db:seed
 ```
 
-Start the dev server:
+### Run the Development Server
 
 ```bash
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
----
-
-## Tests
+## Testing
 
 ```bash
-pnpm test
+pnpm test          # Run all tests once
+pnpm test:watch    # Run tests in watch mode
+pnpm test:ui       # Open the Vitest UI
 ```
 
-Runs Vitest in CI mode. Tests cover:
-
-- `lib/invoice-utils` — calculateTotal, formatCurrency, getStatusColor, getStatusLabel, calculateBalanceDue
-- `InvoiceStatusBadge` — color class and label per status
-- `StatusTabs` — tab rendering, active state, router integration
-- `SearchInput` — controlled input, router integration
-- `lib/demo/seed` — fixture shape and data integrity
-- `InvoiceRow` — render, edit toggle, cancel reset
-
----
-
-## Project structure
+## Project Structure
 
 ```
-app/
-  (auth)/         login, register, password reset
-  (dashboard)/    protected routes: invoices, jobs, customers, payments, settings
-  components/     shared UI: Sidebar, TopBar, InvoiceTable, InvoiceStatusBadge, EmptyState
-  demo/           read-only demo page (no auth required)
-lib/
-  types.ts        shared domain interfaces
-  invoice-utils.ts  pure calculation and formatting helpers
-  demo/           seeded fixture data
-prisma/
-  schema.prisma   database schema
-  seed.ts         development seed script
-__tests__/        all test files
+tanager-invoicing/
+├── app/
+│   ├── (auth)/              # Authentication pages
+│   │   ├── login/           #   Sign in
+│   │   ├── register/        #   Create account
+│   │   ├── forgot-password/ #   Request password reset
+│   │   └── reset-password/  #   Complete password reset
+│   ├── (dashboard)/         # Protected application routes
+│   │   ├── customers/       #   Customer management
+│   │   ├── jobs/            #   Job tracking
+│   │   ├── invoices/        #   Invoice CRUD and PDF generation
+│   │   ├── payments/        #   Payment recording
+│   │   ├── profile/         #   User profile
+│   │   └── settings/        #   Company settings
+│   ├── components/          # Shared UI components
+│   │   ├── Sidebar.tsx      #   Navigation sidebar
+│   │   ├── TopBar.tsx       #   Top navigation bar
+│   │   ├── InvoiceTable.tsx #   Invoice listing table
+│   │   ├── StatusTabs.tsx   #   Filterable status tabs
+│   │   ├── SearchInput.tsx  #   Search with URL sync
+│   │   └── ...
+│   └── demo/                # Public demo page (no auth)
+├── lib/
+│   ├── types.ts             # Shared TypeScript interfaces
+│   ├── invoice-utils.ts     # Calculation and formatting helpers
+│   └── demo/                # Static fixture data for demo mode
+├── prisma/
+│   ├── schema.prisma        # Database schema
+│   └── seed.ts              # Development seed script
+└── __tests__/               # Unit and component tests
 ```
 
----
+## Data Model
+
+```
+Company 1─┬─* User
+          ├─* Customer 1──* Job 1──* Invoice 1──* Payment
+          │                                  └──* InvoiceItem
+          ├─* Job
+          ├─* Invoice
+          └─* Payment
+```
+
+All monetary values are stored as **integers in cents** to avoid floating-point precision issues.
+
+## Scripts
+
+| Command | Description |
+| --- | --- |
+| `pnpm dev` | Start the development server |
+| `pnpm build` | Create a production build |
+| `pnpm start` | Start the production server |
+| `pnpm lint` | Run ESLint |
+| `pnpm test` | Run the test suite |
+| `pnpm test:watch` | Run tests in watch mode |
+| `pnpm test:ui` | Open Vitest UI |
+| `pnpm db:seed` | Seed the database with sample data |
 
 ## License
 
-MIT
+[MIT](LICENSE)
