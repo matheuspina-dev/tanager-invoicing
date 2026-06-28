@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcrypt";
+import { validatePassword } from "@/lib/validation";
 
 export async function updateProfile(formData: FormData) {
   const session = await getServerSession(authOptions);
@@ -15,9 +16,10 @@ export async function updateProfile(formData: FormData) {
 
   if (!name) throw new Error("Name is required");
 
-  const data: any = { name };
+  const data: { name: string; password?: string } = { name };
 
   if (password && password.trim() !== "") {
+    validatePassword(password);
     data.password = await bcrypt.hash(password, 10);
   }
 

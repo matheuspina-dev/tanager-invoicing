@@ -4,6 +4,7 @@ import { prisma } from "../../../lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { validateJobStatus } from "@/lib/validation";
 
 async function getUserCompanyId() {
   const session = await getServerSession(authOptions);
@@ -15,7 +16,8 @@ export async function createJob(formData: FormData) {
   const companyId = await getUserCompanyId();
   const description = formData.get("description")?.toString();
   const customerId = formData.get("customerId")?.toString();
-  const status = (formData.get("status")?.toString() || "OPEN") as string;
+  const statusRaw = formData.get("status")?.toString() || "OPEN";
+  const status = validateJobStatus(statusRaw);
 
   if (!description || !customerId)
     throw new Error("Description and Customer required");
@@ -36,7 +38,8 @@ export async function updateJob(formData: FormData) {
 
   const description =
     formData.get("description")?.toString() || job.description;
-  const status = formData.get("status")?.toString() || job.status;
+  const statusRaw = formData.get("status")?.toString() || job.status;
+  const status = validateJobStatus(statusRaw);
 
   await prisma.job.update({
     where: { id: job.id },
