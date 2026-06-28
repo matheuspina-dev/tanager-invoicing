@@ -1,15 +1,9 @@
 "use server";
 
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
-
-async function getUserCompanyId() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.companyId) throw new Error("Unauthorized");
-  return session.user.companyId;
-}
+import { getUserCompanyId } from "@/lib/auth";
+import { requireFormId, requireRecord } from "@/lib/server-action-utils";
 
 export async function createCustomer(formData: FormData) {
   const companyId = await getUserCompanyId();
@@ -25,13 +19,12 @@ export async function createCustomer(formData: FormData) {
 
 export async function updateCustomer(formData: FormData) {
   const companyId = await getUserCompanyId();
-  const id = formData.get("id") as string;
-  if (!id) throw new Error("Customer ID required");
+  const id = requireFormId(formData, "id", "Customer ID");
 
-  const customer = await prisma.customer.findFirst({
-    where: { id, companyId },
-  });
-  if (!customer) throw new Error("Customer not found");
+  const customer = await requireRecord(
+    () => prisma.customer.findFirst({ where: { id, companyId } }),
+    "Customer",
+  );
 
   const name = formData.get("name") as string;
   const phone = formData.get("phone")?.toString() || null;
@@ -46,13 +39,12 @@ export async function updateCustomer(formData: FormData) {
 
 export async function deleteCustomer(formData: FormData) {
   const companyId = await getUserCompanyId();
-  const id = formData.get("id") as string;
-  if (!id) throw new Error("Customer ID required");
+  const id = requireFormId(formData, "id", "Customer ID");
 
-  const customer = await prisma.customer.findFirst({
-    where: { id, companyId },
-  });
-  if (!customer) throw new Error("Customer not found");
+  const customer = await requireRecord(
+    () => prisma.customer.findFirst({ where: { id, companyId } }),
+    "Customer",
+  );
 
   const blocked = await prisma.customer.findFirst({
     where: {

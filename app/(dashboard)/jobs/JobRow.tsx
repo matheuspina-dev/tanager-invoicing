@@ -2,15 +2,10 @@
 
 import { useState } from "react";
 import { updateJob, deleteJob } from "./actions";
+import { getJobStatusColor } from "@/lib/invoice-utils";
 
 export function JobRow({ job }: { job: any }) {
   const [editing, setEditing] = useState(false);
-
-  const statusColors: Record<string, string> = {
-    OPEN: "bg-blue-100 text-blue-800",
-    IN_PROGRESS: "bg-yellow-100 text-yellow-800",
-    CLOSED: "bg-gray-100 text-gray-800",
-  };
 
   return (
     <li className="bg-white border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
@@ -22,9 +17,7 @@ export function JobRow({ job }: { job: any }) {
                 {job.description}
               </p>
               <span
-                className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                  statusColors[job.status] || "bg-gray-100 text-gray-800"
-                }`}
+                className={`text-xs px-2 py-0.5 rounded-full font-medium ${getJobStatusColor(job.status)}`}
               >
                 {job.status.replace("_", " ")}
               </span>

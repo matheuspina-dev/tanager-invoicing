@@ -75,3 +75,13 @@ export async function requireCompanyId() {
 
   return session.user.companyId;
 }
+
+/**
+ * Return the current user's companyId or throw.
+ * Use in server actions where a redirect is not appropriate.
+ */
+export async function getUserCompanyId(): Promise<string> {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.companyId) throw new Error("Unauthorized");
+  return session.user.companyId;
+}
