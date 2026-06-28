@@ -5,8 +5,9 @@ import StatusTabs from "@/app/components/StatusTabs";
 
 // next/navigation is mocked in vitest.setup.ts via the module mock in vitest.config.ts.
 // The mock provides a no-op router.push and a stable useRouter.
+const pushMock = vi.fn();
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: vi.fn(() => ({ push: pushMock })),
   usePathname: () => "/invoices",
   useSearchParams: () => new URLSearchParams(),
 }));
@@ -47,13 +48,9 @@ describe("StatusTabs", () => {
   });
 
   it("calls router.push when a tab is clicked", async () => {
-    const push = vi.fn();
-    vi.mocked(
-      (await import("next/navigation")).useRouter
-    ).mockReturnValue({ push } as ReturnType<typeof import("next/navigation").useRouter>);
-
+    pushMock.mockClear();
     render(<StatusTabs currentStatus="ALL" statuses={STATUSES} />);
     await userEvent.click(screen.getByText("UNPAID"));
-    expect(push).toHaveBeenCalled();
+    expect(pushMock).toHaveBeenCalled();
   });
 });
