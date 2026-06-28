@@ -1,16 +1,10 @@
 "use server";
 
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getUserCompanyId } from "@/lib/auth";
+import { requireFormId, requireRecord } from "@/lib/server-action-utils";
 import { validateJobStatus } from "@/lib/validation";
-
-async function getUserCompanyId() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.companyId) throw new Error("Unauthorized");
-  return session.user.companyId;
-}
 
 export async function createJob(formData: FormData) {
   const companyId = await getUserCompanyId();
@@ -30,11 +24,12 @@ export async function createJob(formData: FormData) {
 
 export async function updateJob(formData: FormData) {
   const companyId = await getUserCompanyId();
-  const id = formData.get("id")?.toString();
-  if (!id) throw new Error("Job ID required");
+  const id = requireFormId(formData, "id", "Job ID");
 
-  const job = await prisma.job.findFirst({ where: { id, companyId } });
-  if (!job) throw new Error("Job not found");
+  const job = await requireRecord(
+    () => prisma.job.findFirst({ where: { id, companyId } }),
+    "Job",
+  );
 
   const description =
     formData.get("description")?.toString() || job.description;
@@ -50,11 +45,12 @@ export async function updateJob(formData: FormData) {
 
 export async function deleteJob(formData: FormData) {
   const companyId = await getUserCompanyId();
-  const id = formData.get("id")?.toString();
-  if (!id) throw new Error("Job ID required");
+  const id = requireFormId(formData, "id", "Job ID");
 
-  const job = await prisma.job.findFirst({ where: { id, companyId } });
-  if (!job) throw new Error("Job not found");
+  const job = await requireRecord(
+    () => prisma.job.findFirst({ where: { id, companyId } }),
+    "Job",
+  );
 
   await prisma.job.delete({ where: { id: job.id } });
   revalidatePath("/jobs");

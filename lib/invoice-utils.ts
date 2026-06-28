@@ -53,6 +53,38 @@ export function getStatusLabel(status: string): string {
 }
 
 /**
+ * Return the Tailwind CSS class string for a given job status.
+ */
+export function getJobStatusColor(status: string): string {
+  switch (status) {
+    case "OPEN":
+      return "bg-blue-100 text-blue-800";
+    case "IN_PROGRESS":
+      return "bg-yellow-100 text-yellow-800";
+    case "CLOSED":
+      return "bg-gray-100 text-gray-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+}
+
+/**
+ * Return the Tailwind CSS class string for a given payment method.
+ */
+export function getPaymentMethodColor(method: string): string {
+  switch (method) {
+    case "CASH":
+      return "bg-green-100 text-green-800";
+    case "CARD":
+      return "bg-purple-100 text-purple-800";
+    case "OTHER":
+      return "bg-gray-100 text-gray-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+}
+
+/**
  * Calculate the balance due for an invoice:
  * total amount minus all recorded payments.
  * Returns 0 if payments exceed the invoice amount.

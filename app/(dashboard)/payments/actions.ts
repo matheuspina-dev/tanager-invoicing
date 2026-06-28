@@ -2,15 +2,9 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getUserCompanyId } from "@/lib/auth";
+import { requireFormId, requireRecord } from "@/lib/server-action-utils";
 import { validatePaymentMethod } from "@/lib/validation";
-
-async function getUserCompanyId() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.companyId) throw new Error("Unauthorized");
-  return session.user.companyId;
-}
 
 async function recalcInvoiceStatus(invoiceId: string) {
   const invoice = await prisma.invoice.findUnique({
@@ -52,11 +46,12 @@ export async function createPayment(formData: FormData) {
 
 export async function updatePayment(formData: FormData) {
   const companyId = await getUserCompanyId();
-  const id = formData.get("id")?.toString();
-  if (!id) throw new Error("Payment ID required");
+  const id = requireFormId(formData, "id", "Payment ID");
 
-  const payment = await prisma.payment.findFirst({ where: { id, companyId } });
-  if (!payment) throw new Error("Payment not found");
+  const payment = await requireRecord(
+    () => prisma.payment.findFirst({ where: { id, companyId } }),
+    "Payment",
+  );
 
   const amount = parseInt(
     formData.get("amount")?.toString() || payment.amount.toString()
@@ -76,11 +71,12 @@ export async function updatePayment(formData: FormData) {
 
 export async function deletePayment(formData: FormData) {
   const companyId = await getUserCompanyId();
-  const id = formData.get("id")?.toString();
-  if (!id) throw new Error("Payment ID required");
+  const id = requireFormId(formData, "id", "Payment ID");
 
-  const payment = await prisma.payment.findFirst({ where: { id, companyId } });
-  if (!payment) throw new Error("Payment not found");
+  const payment = await requireRecord(
+    () => prisma.payment.findFirst({ where: { id, companyId } }),
+    "Payment",
+  );
 
   await prisma.payment.delete({ where: { id: payment.id } });
   await recalcInvoiceStatus(payment.invoiceId);
