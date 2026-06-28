@@ -3,12 +3,15 @@
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
+import { validatePassword } from "@/lib/validation";
 
 export async function resetPassword(formData: FormData) {
   const token = formData.get("token")?.toString();
-  const password = formData.get("password")?.toString();
+  const passwordRaw = formData.get("password")?.toString();
 
-  if (!token || !password) throw new Error("Missing fields");
+  if (!token || !passwordRaw) throw new Error("Missing fields");
+
+  const password = validatePassword(passwordRaw);
 
   const user = await prisma.user.findUnique({
     where: { resetToken: token },

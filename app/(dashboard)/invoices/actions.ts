@@ -1,44 +1,22 @@
 "use server";
 
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getUserCompanyId } from "@/lib/auth";
+import { requireFormId, requireRecord, parseFormItems } from "@/lib/server-action-utils";
 import { generateInvoicePdf } from "./pdf";
 import { sendEmail } from "@/lib/email";
-
-async function getUserCompanyId() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.companyId) throw new Error("Unauthorized");
-  return session.user.companyId;
-}
+import { validateInvoiceStatus } from "@/lib/validation";
 
 export async function createInvoice(formData: FormData) {
   const companyId = await getUserCompanyId();
   const jobId = formData.get("jobId")?.toString();
-  const status = formData.get("status")?.toString() || "UNPAID";
+  const statusRaw = formData.get("status")?.toString() || "UNPAID";
+  const status = validateInvoiceStatus(statusRaw);
 
   if (!jobId) throw new Error("Job required");
 
-  const items: { description: string; price: number }[] = [];
-
-  for (let i = 0; ; i++) {
-    const description = formData
-      .get(`items[${i}][description]`)
-      ?.toString()
-      .trim();
-
-    const priceRaw = formData.get(`items[${i}][price]`)?.toString();
-
-    if (!description || !priceRaw) break;
-
-    const price = parseInt(priceRaw, 10);
-    if (isNaN(price) || price <= 0) {
-      throw new Error("Invalid item price");
-    }
-
-    items.push({ description, price });
-  }
+  const items = parseFormItems(formData);
 
   if (items.length === 0) {
     throw new Error("At least one invoice item is required");
@@ -54,34 +32,17 @@ export async function createInvoice(formData: FormData) {
 
 export async function updateInvoice(formData: FormData) {
   const companyId = await getUserCompanyId();
-  const id = formData.get("id")?.toString();
-  if (!id) throw new Error("Invoice ID required");
+  const id = requireFormId(formData, "id", "Invoice ID");
 
-  const invoice = await prisma.invoice.findFirst({ where: { id, companyId } });
-  if (!invoice) throw new Error("Invoice not found");
+  const invoice = await requireRecord(
+    () => prisma.invoice.findFirst({ where: { id, companyId } }),
+    "Invoice",
+  );
 
-  const status = formData.get("status")?.toString() || invoice.status;
+  const statusRaw = formData.get("status")?.toString() || invoice.status;
+  const status = validateInvoiceStatus(statusRaw);
 
-  const items: { description: string; price: number }[] = [];
-  for (let i = 0; ; i++) {
-    const description = formData
-      .get(`items[${i}][description]`)
-      ?.toString()
-      .trim();
-    const priceRaw = formData.get(`items[${i}][price]`)?.toString();
-
-    if (!description || !priceRaw) break;
-
-    const price = parseInt(priceRaw, 10);
-    if (isNaN(price) || price <= 0) {
-      throw new Error("Invalid item price");
-    }
-    items.push({ description, price });
-  }
-
-  if (items.length === 0) {
-    throw new Error("At least one invoice item is required");
-  }
+  const items = parseFormItems(formData, { strict: false });
 
   const newAmount = items.reduce((sum, item) => sum + item.price, 0);
 
@@ -107,11 +68,12 @@ export async function updateInvoice(formData: FormData) {
 
 export async function deleteInvoice(formData: FormData) {
   const companyId = await getUserCompanyId();
-  const id = formData.get("id")?.toString();
-  if (!id) throw new Error("Invoice ID required");
+  const id = requireFormId(formData, "id", "Invoice ID");
 
-  const invoice = await prisma.invoice.findFirst({ where: { id, companyId } });
-  if (!invoice) throw new Error("Invoice not found");
+  const invoice = await requireRecord(
+    () => prisma.invoice.findFirst({ where: { id, companyId } }),
+    "Invoice",
+  );
 
   await prisma.invoice.delete({ where: { id: invoice.id } });
   revalidatePath("/invoices");
@@ -120,17 +82,21 @@ export async function deleteInvoice(formData: FormData) {
 export async function emailInvoice(invoiceId: string) {
   const companyId = await getUserCompanyId();
 
-  const invoice = await prisma.invoice.findFirst({
-    where: { id: invoiceId, companyId },
-    include: {
-      job: { include: { customer: true } },
-      payments: true,
-      items: true,
-      company: true,
-    },
-  });
+  const invoice = await requireRecord(
+    () =>
+      prisma.invoice.findFirst({
+        where: { id: invoiceId, companyId },
+        include: {
+          job: { include: { customer: true } },
+          payments: true,
+          items: true,
+          company: true,
+        },
+      }),
+    "Invoice",
+  );
 
-  if (!invoice || !invoice.job.customer?.email)
+  if (!invoice.job.customer?.email)
     throw new Error("Customer email not found");
 
   const pdfBuffer = await generateInvoicePdf(invoice);

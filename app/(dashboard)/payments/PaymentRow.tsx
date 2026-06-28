@@ -2,16 +2,11 @@
 
 import { useState } from "react";
 import { updatePayment, deletePayment } from "./actions";
+import { getPaymentMethodColor } from "@/lib/invoice-utils";
 
 export function PaymentRow({ payment }: { payment: any }) {
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const methodColors: Record<string, string> = {
-    CASH: "bg-green-100 text-green-800",
-    CARD: "bg-purple-100 text-purple-800",
-    OTHER: "bg-gray-100 text-gray-800",
-  };
 
   return (
     <li className="bg-white border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
@@ -23,9 +18,7 @@ export function PaymentRow({ payment }: { payment: any }) {
                 ${(payment.amount / 100).toFixed(2)}
               </span>
               <span
-                className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full font-bold ${
-                  methodColors[payment.method] || "bg-gray-100"
-                }`}
+                className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full font-bold ${getPaymentMethodColor(payment.method)}`}
               >
                 {payment.method}
               </span>

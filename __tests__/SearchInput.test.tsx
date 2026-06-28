@@ -3,8 +3,9 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SearchInput from "@/app/components/SearchInput";
 
+const pushMock = vi.fn();
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: vi.fn(() => ({ push: pushMock })),
   usePathname: () => "/invoices",
   useSearchParams: () => new URLSearchParams(),
 }));
@@ -39,14 +40,10 @@ describe("SearchInput", () => {
   });
 
   it("calls router.push when the input value changes", async () => {
-    const push = vi.fn();
-    vi.mocked(
-      (await import("next/navigation")).useRouter
-    ).mockReturnValue({ push } as ReturnType<typeof import("next/navigation").useRouter>);
-
+    pushMock.mockClear();
     render(<SearchInput currentQuery="" />);
     const input = screen.getByRole("textbox");
     await userEvent.type(input, "r");
-    expect(push).toHaveBeenCalled();
+    expect(pushMock).toHaveBeenCalled();
   });
 });
