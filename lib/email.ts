@@ -13,10 +13,6 @@ function getClient(): Resend {
   return client;
 }
 
-/**
- * The platform's default sender, used for account emails (e.g. password
- * reset). Must be an address on a domain verified in Resend.
- */
 export function platformSender(): string {
   const from = process.env.EMAIL_FROM;
   if (!from) {
@@ -25,11 +21,6 @@ export function platformSender(): string {
   return from;
 }
 
-/**
- * Build a sender that shows the company's name while still sending from the
- * platform's verified address, e.g. `"Acme Plumbing <noreply@tanager.app>"`.
- * Replies are routed to the company via the `replyTo` field on the message.
- */
 export function companySender(companyName: string): string {
   const base = platformSender();
   const match = base.match(/<([^>]+)>/);
