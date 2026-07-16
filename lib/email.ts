@@ -1,36 +1,49 @@
-import { ClientSecretCredential } from "@azure/identity";
+import { Resend } from "resend";
 
-let credential: ClientSecretCredential | null = null;
+let client: Resend | null = null;
 
-function getCredential(): ClientSecretCredential {
-  if (!credential) {
-    const tenantId = process.env.TENANT_ID;
-    const clientId = process.env.CLIENT_ID;
-    const clientSecret = process.env.CLIENT_SECRET;
-
-    if (!tenantId || !clientId || !clientSecret) {
-      throw new Error(
-        "Email is not configured: missing TENANT_ID, CLIENT_ID, or CLIENT_SECRET"
-      );
-    }
-
-    credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+function getClient(): Resend {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error("Email is not configured: missing RESEND_API_KEY");
   }
-  return credential;
+  if (!client) {
+    client = new Resend(apiKey);
+  }
+  return client;
 }
 
-async function getAccessToken() {
-  const token = await getCredential().getToken(
-    "https://graph.microsoft.com/.default"
-  );
-  if (!token?.token) throw new Error("Failed to get access token");
-  return token.token;
+/**
+ * The platform's default sender, used for account emails (e.g. password
+ * reset). Must be an address on a domain verified in Resend.
+ */
+export function platformSender(): string {
+  const from = process.env.EMAIL_FROM;
+  if (!from) {
+    throw new Error("Email is not configured: missing EMAIL_FROM");
+  }
+  return from;
+}
+
+/**
+ * Build a sender that shows the company's name while still sending from the
+ * platform's verified address, e.g. `"Acme Plumbing <noreply@tanager.app>"`.
+ * Replies are routed to the company via the `replyTo` field on the message.
+ */
+export function companySender(companyName: string): string {
+  const base = platformSender();
+  const match = base.match(/<([^>]+)>/);
+  const address = match ? match[1] : base.trim();
+  const cleanName = companyName.replace(/[<>"]/g, "").trim();
+  return cleanName ? `${cleanName} <${address}>` : base;
 }
 
 export async function sendEmail(options: {
   to: string;
   subject: string;
   text: string;
+  from?: string;
+  replyTo?: string;
   attachments?: { filename: string; content: Buffer }[];
 }) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -38,43 +51,19 @@ export async function sendEmail(options: {
     throw new Error("Invalid recipient email address");
   }
 
-  if (!process.env.SMTP_USER) {
-    throw new Error("Email is not configured: missing SMTP_USER");
-  }
+  const { error } = await getClient().emails.send({
+    from: options.from ?? platformSender(),
+    to: options.to,
+    subject: options.subject,
+    text: options.text,
+    replyTo: options.replyTo,
+    attachments: options.attachments?.map((a) => ({
+      filename: a.filename,
+      content: a.content,
+    })),
+  });
 
-  const accessToken = await getAccessToken();
-
-  const attachments =
-    options.attachments?.map((a) => ({
-      "@odata.type": "#microsoft.graph.fileAttachment",
-      name: a.filename,
-      contentBytes: a.content.toString("base64"),
-    })) || [];
-
-  const res = await fetch(
-    `https://graph.microsoft.com/v1.0/users/${process.env.SMTP_USER}/sendMail`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message: {
-          subject: options.subject,
-          body: {
-            contentType: "Text",
-            content: options.text,
-          },
-          toRecipients: [{ emailAddress: { address: options.to } }],
-          attachments,
-        },
-      }),
-    }
-  );
-
-  if (!res.ok) {
-    const error = await res.text();
-    throw new Error(`Graph sendMail failed: ${error}`);
+  if (error) {
+    throw new Error(`Failed to send email: ${error.message}`);
   }
 }

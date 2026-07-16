@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getUserCompanyId } from "@/lib/auth";
 import { requireFormId, requireRecord, parseFormItems } from "@/lib/server-action-utils";
 import { generateInvoicePdf } from "./pdf";
-import { sendEmail } from "@/lib/email";
+import { sendEmail, companySender } from "@/lib/email";
 import { validateInvoiceStatus } from "@/lib/validation";
 
 export async function createInvoice(formData: FormData) {
@@ -103,8 +103,10 @@ export async function emailInvoice(invoiceId: string) {
 
   await sendEmail({
     to: invoice.job.customer.email,
+    from: companySender(invoice.company.name),
+    replyTo: invoice.company.email ?? undefined,
     subject: `Invoice #${invoice.id}`,
-    text: "Please find your invoice attached.",
+    text: `Please find invoice #${invoice.id} from ${invoice.company.name} attached.`,
     attachments: [
       { filename: `invoice-${invoice.id}.pdf`, content: pdfBuffer },
     ],
