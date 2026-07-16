@@ -26,7 +26,7 @@ A public **demo mode** is available at `/demo` with read-only sample data — no
 - **Invoicing** — line-item invoices with Unpaid / In Progress / Paid workflow
 - **Payments** — record payments against invoices with running balance calculation
 - **PDF generation** — create and download professional invoice PDFs via pdf-lib
-- **Email delivery** — send invoices directly to customers through Nodemailer
+- **Email delivery** — send invoices directly to customers through Resend
 - **Authentication** — credentials-based auth with JWT sessions via NextAuth.js
 - **Demo mode** — static fixture data at `/demo`, no login required
 
@@ -40,7 +40,7 @@ A public **demo mode** is available at `/demo` with read-only sample data — no
 | Authentication | [NextAuth.js](https://next-auth.js.org/) (credentials + JWT) |
 | Styling | [Tailwind CSS v4](https://tailwindcss.com/) |
 | PDF Generation | [pdf-lib](https://pdf-lib.js.org/) |
-| Email | [Nodemailer](https://nodemailer.com/) |
+| Email | [Resend](https://resend.com/) |
 | Testing | [Vitest](https://vitest.dev/) + [React Testing Library](https://testing-library.com/) |
 | Deployment | [Vercel](https://vercel.com/) |
 
@@ -74,11 +74,12 @@ cp .env.example .env
 | `NEXTAUTH_SECRET` | Yes | Random secret for JWT signing |
 | `NEXTAUTH_URL` | Yes | Application URL (e.g. `http://localhost:3000`) |
 | `NEXT_PUBLIC_URL` | Yes | Public-facing URL |
-| `EMAIL_SERVER_HOST` | No | SMTP host for invoice email delivery |
-| `EMAIL_SERVER_PORT` | No | SMTP port (default `587`) |
-| `EMAIL_SERVER_USER` | No | SMTP username |
-| `EMAIL_SERVER_PASSWORD` | No | SMTP password |
-| `EMAIL_FROM` | No | Sender email address |
+| `RESEND_API_KEY` | No | [Resend](https://resend.com) API key for sending email (password resets and invoices) |
+| `EMAIL_FROM` | No | Default/platform sender, e.g. `Tanager <noreply@yourdomain.com>` (must be on a domain verified in Resend) |
+
+Email is sent via Resend. Password-reset emails come from `EMAIL_FROM`; invoice emails
+are sent with the company's name as the `From` (on the `EMAIL_FROM` domain) and the
+company's own email as `Reply-To`.
 
 ### Database Setup
 
