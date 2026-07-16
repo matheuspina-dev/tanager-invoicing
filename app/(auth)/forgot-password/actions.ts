@@ -4,14 +4,20 @@ import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
 import { sendEmail } from "@/lib/email";
 
-export async function requestPasswordReset(formData: FormData) {
+export type RequestPasswordResetResult =
+  | { success: true }
+  | { success: false; error: string };
+
+export async function requestPasswordReset(
+  formData: FormData,
+): Promise<RequestPasswordResetResult> {
   const email = formData.get("email")?.toString();
-  if (!email) throw new Error("Email is required");
+  if (!email) return { success: false, error: "Email is required" };
 
   const user = await prisma.user.findUnique({ where: { email } });
 
   // Don't reveal whether the email exists
-  if (!user) return;
+  if (!user) return { success: true };
 
   const token = crypto.randomBytes(32).toString("hex");
   const expiry = new Date(Date.now() + 3600000);
@@ -33,6 +39,11 @@ export async function requestPasswordReset(formData: FormData) {
       text: `Click here to reset your password: ${resetUrl}`,
     });
   } catch {
-    throw new Error("Failed to send reset email. Please try again later.");
+    return {
+      success: false,
+      error: "Failed to send reset email. Please try again later.",
+    };
   }
+
+  return { success: true };
 }

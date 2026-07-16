@@ -13,17 +13,16 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     setMessage(null);
     setIsError(false);
-    try {
-      await requestPasswordReset(formData);
+
+    const result = await requestPasswordReset(formData);
+
+    if (result.success) {
       setMessage("If an account exists, a reset link has been sent.");
-    } catch (err: unknown) {
+    } else {
       setIsError(true);
-      setMessage(
-        err instanceof Error ? err.message : "Something went wrong. Please try again.",
-      );
-    } finally {
-      setLoading(false);
+      setMessage(result.error);
     }
+    setLoading(false);
   }
 
   return (
