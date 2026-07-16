@@ -38,7 +38,8 @@ export async function requestPasswordReset(
       subject: "Reset your Password",
       text: `Click here to reset your password: ${resetUrl}`,
     });
-  } catch {
+  } catch (err) {
+    console.error("Failed to send password reset email:", err);
     return {
       success: false,
       error: "Failed to send reset email. Please try again later.",
