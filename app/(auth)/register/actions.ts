@@ -1,10 +1,15 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { validatePassword, validateEmail } from "@/lib/validation";
+
+type TransactionClient = Omit<
+  PrismaClient,
+  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
+>;
 
 export async function registerCompanyOwner(formData: FormData) {
   const name = formData.get("name")?.toString();
@@ -26,7 +31,7 @@ export async function registerCompanyOwner(formData: FormData) {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  await prisma.$transaction(async (tx: TransactionClient) => {
     const company = await tx.company.create({
       data: {
         name: companyName,
