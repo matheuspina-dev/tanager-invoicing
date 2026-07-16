@@ -16,27 +16,23 @@ export default function RegisterPage() {
   async function handleOwnerSubmit(formData: FormData) {
     setLoading(true);
     setError(null);
-    try {
-      const res = await registerCompanyOwner(formData);
-      if (res.success && res.companyCode) {
-        setSuccessData({ code: res.companyCode });
-      }
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    const res = await registerCompanyOwner(formData);
+    if (res.success) {
+      setSuccessData({ code: res.companyCode });
+    } else {
+      setError(res.error);
     }
+    setLoading(false);
   }
 
   async function handleEmployeeSubmit(formData: FormData) {
     setLoading(true);
     setError(null);
-    try {
-      await registerEmployee(formData);
+    const res = await registerEmployee(formData);
+    if (res.success) {
       router.push("/login?registered=true");
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
+    } else {
+      setError(res.error);
       setLoading(false);
     }
   }
