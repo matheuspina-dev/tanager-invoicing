@@ -1,5 +1,6 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
@@ -25,7 +26,7 @@ export async function registerCompanyOwner(formData: FormData) {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const company = await tx.company.create({
       data: {
         name: companyName,
