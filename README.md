@@ -6,7 +6,7 @@
 
 Built with Next.js 16 &middot; TypeScript 5 &middot; PostgreSQL &middot; Prisma &middot; Tailwind CSS
 
-[Live Demo](https://tanager-invoicing-topaz.vercel.app/)
+[Live Demo](https://www.invoicing.tanagerventures.com/)
 
 </div>
 
@@ -69,14 +69,14 @@ Copy the example environment file and fill in your values:
 cp .env.example .env
 ```
 
-| Variable          | Required | Description                                                               |
-| ----------------- | :------: | ------------------------------------------------------------------------- |
-| `DATABASE_URL`    |   Yes    | PostgreSQL connection string                                              |
-| `NEXTAUTH_SECRET` |   Yes    | Random secret for JWT signing (e.g. `openssl rand -base64 32`)           |
-| `NEXTAUTH_URL`    |   Yes    | Application URL used for auth callbacks (e.g. `http://localhost:3000`) |
-| `NEXT_PUBLIC_URL` |   Yes    | Public-facing URL used for password reset links (usually same as above)  |
-| `RESEND_API_KEY`  |    No    | Resend API key for sending invoice and password-reset emails              |
-| `EMAIL_FROM`      |    No    | Default sender address for transactional emails                           |
+| Variable          | Required | Description                                                             |
+| ----------------- | :------: | ----------------------------------------------------------------------- |
+| `DATABASE_URL`    |   Yes    | PostgreSQL connection string                                            |
+| `NEXTAUTH_SECRET` |   Yes    | Random secret for JWT signing (e.g. `openssl rand -base64 32`)          |
+| `NEXTAUTH_URL`    |   Yes    | Application URL used for auth callbacks (e.g. `http://localhost:3000`)  |
+| `NEXT_PUBLIC_URL` |   Yes    | Public-facing URL used for password reset links (usually same as above) |
+| `RESEND_API_KEY`  |    No    | Resend API key for sending invoice and password-reset emails            |
+| `EMAIL_FROM`      |    No    | Default sender address for transactional emails                         |
 
 Email features are optional; the app will run without them, but invoice and reset emails will fail until Resend is configured.
 
